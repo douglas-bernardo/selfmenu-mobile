@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export const Container = styled.View`
   flex-direction: row;
@@ -22,13 +22,16 @@ export const ItemPhoto = styled.Image`
 `;
 
 export const Title = styled.Text`
+  color: ${({ theme }) => theme.colors.text_dark};
   font-family: ${({ theme }) => theme.fonts.regular};
   font-size: ${RFValue(14)}px;
 `;
 
 export const Description = styled.View``;
 
-export const DescriptionText = styled.Text``;
+export const DescriptionText = styled.Text`
+  color: ${({ theme }) => theme.colors.text_dark};
+`;
 
 export const Footer = styled.View`
   flex-direction: row;
@@ -37,6 +40,10 @@ export const Footer = styled.View`
   margin-top: 10px;
 `;
 
-export const Price = styled.Text``;
+export const Price = styled.Text`
+  color: ${({ theme }) => theme.colors.text_dark};
+`;
 
-export const Rate = styled.Text``;
+export const Rate = styled.Text`
+  color: ${({ theme }) => theme.colors.text_dark};
+`;

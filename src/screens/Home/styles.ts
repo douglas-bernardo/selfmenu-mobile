@@ -20,9 +20,9 @@ export const Container = styled.View`
 
 export const Header = styled.View`
   width: 100%;
-  height: ${RFPercentage(28)}px;
+  height: ${RFPercentage(25)}px;
 
-  background-color: #f9bec7;
+  background-color: ${({ theme }) => theme.colors.background};
 
   justify-content: center;
   align-items: flex-start;
@@ -47,10 +47,14 @@ export const RestaurantInfo = styled.View`
   align-items: center;
 `;
 
+export const LogOutButton = styled.TouchableOpacity``;
+
 export const Logo = styled.Image`
   width: ${RFValue(60)}px;
   height: ${RFValue(60)}px;
 
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.attention};
   border-radius: 10px;
 `;
 
@@ -80,7 +84,7 @@ export const CategoriesListContainer = styled.View`
 export const CategoriesList = styled(
   FlatList as new () => FlatList<Category>,
 ).attrs({
-  contentContainerStyle: { paddingHorizontal: 24 },
+  contentContainerStyle: { paddingLeft: 24 },
 })`
   padding: 24px 0;
 `;
@@ -89,7 +93,9 @@ export const CategoryContainer = styled(
   TouchableOpacity,
 )<CategoryContainerProps>`
   background: ${props =>
-    props.selected ? '#FF0A54' : props.theme.colors.background};
+    props.selected
+      ? props.theme.colors.attention
+      : props.theme.colors.background};
 
   flex-direction: row;
   padding: 8px 12px;
@@ -112,6 +118,7 @@ export const MenuItemsContainer = styled.View`
 `;
 
 export const Title = styled.Text`
+  color: ${({ theme }) => theme.colors.text_dark};
   font-size: ${RFValue(18)}px;
   margin-bottom: 16px;
 `;

@@ -1,11 +1,11 @@
 import styled from 'styled-components/native';
 
-import { TouchableOpacity } from 'react-native';
+import { RectButton } from 'react-native-gesture-handler';
 
-export const Container = styled(TouchableOpacity)`
+export const Container = styled(RectButton)`
   width: 100%;
   height: 60px;
-  background: #ff9000;
+  background: ${({ theme }) => theme.colors.attention};
   border-radius: 10px;
   margin-top: 50px;
 
@@ -13,8 +13,8 @@ export const Container = styled(TouchableOpacity)`
   align-items: center;
 `;
 
-export const Title = styled.Text`
-  font-family: 'RobotoSlab-Medium';
-  color: #312e38;
+export const ButtonText = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.regular};
+  color: ${({ theme }) => theme.colors.shape};
   font-size: 18px;
 `;

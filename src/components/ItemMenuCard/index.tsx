@@ -13,10 +13,11 @@ import {
 } from './styles';
 
 export interface ItemMenuCardProps {
-  url_photo: string;
-  title: string;
+  id: string;
+  name: string;
   description: string;
-  price: string;
+  url_photo: string;
+  price_formatted: string;
 }
 
 interface Props {
@@ -33,14 +34,14 @@ const ItemMenuCard: React.FC<Props> = ({ data }) => {
       />
 
       <ItemContainer>
-        <Title>{data.title}</Title>
+        <Title>{data.name}</Title>
         <Description>
           <DescriptionText ellipsizeMode="tail" numberOfLines={2}>
             {data.description}
           </DescriptionText>
         </Description>
         <Footer>
-          <Price>{data.price}</Price>
+          <Price>{data.price_formatted}</Price>
           <Rate>5 estrelas</Rate>
         </Footer>
       </ItemContainer>
