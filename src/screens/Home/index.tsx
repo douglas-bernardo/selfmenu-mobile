@@ -96,45 +96,6 @@ const Home: React.FC<Props> = ({ navigation }) => {
     setSelectedCategory(categoryId);
   }, []);
 
-  // const data: DataListProps[] = [
-  //   {
-  //     id: '1',
-  //     url_photo:
-  //       'https://t2.rg.ltmcdn.com/pt/images/1/3/7/salada_tropical_natalina_9731_orig.jpg',
-  //     title: 'Salada Tropical',
-  //     description:
-  //       'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem iure quae excepturi at dolores minima repudiandae neque, fugit ducimus, consectetur eos praesentium, esse sit nulla! Quos debitis beatae exercitationem officia!',
-  //     price: 'R$ 25,00',
-  //   },
-  //   {
-  //     id: '2',
-  //     url_photo:
-  //       'https://t2.rg.ltmcdn.com/pt/images/1/3/7/salada_tropical_natalina_9731_orig.jpg',
-  //     title: 'Salada Tropical',
-  //     description:
-  //       'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem iure quae excepturi at dolores minima repudiandae neque, fugit ducimus, consectetur eos praesentium, esse sit nulla! Quos debitis beatae exercitationem officia!',
-  //     price: 'R$ 25,00',
-  //   },
-  //   {
-  //     id: '3',
-  //     url_photo:
-  //       'https://t2.rg.ltmcdn.com/pt/images/1/3/7/salada_tropical_natalina_9731_orig.jpg',
-  //     title: 'Salada Tropical',
-  //     description:
-  //       'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem iure quae excepturi at dolores minima repudiandae neque, fugit ducimus, consectetur eos praesentium, esse sit nulla! Quos debitis beatae exercitationem officia!',
-  //     price: 'R$ 25,00',
-  //   },
-  //   {
-  //     id: '4',
-  //     url_photo:
-  //       'https://t2.rg.ltmcdn.com/pt/images/1/3/7/salada_tropical_natalina_9731_orig.jpg',
-  //     title: 'Salada Tropical',
-  //     description:
-  //       'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem iure quae excepturi at dolores minima repudiandae neque, fugit ducimus, consectetur eos praesentium, esse sit nulla! Quos debitis beatae exercitationem officia!',
-  //     price: 'R$ 25,00',
-  //   },
-  // ];
-
   return (
     <>
       <StatusBar
@@ -153,11 +114,11 @@ const Home: React.FC<Props> = ({ navigation }) => {
 
               <Restaurant>
                 <RestaurantGreeting>Bem vindo ao,</RestaurantGreeting>
-                <RestaurantName>{restaurant.name}</RestaurantName>
+                <RestaurantName>{restaurant.establishment_name}</RestaurantName>
               </Restaurant>
             </RestaurantInfo>
             <LogOutButton onPress={signOut}>
-              <Icon name="power" />
+              <Icon name="qr-code-scanner" />
             </LogOutButton>
           </RestaurantWrapper>
         </Header>

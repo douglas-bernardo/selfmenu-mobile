@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import FeatherIcon from 'react-native-vector-icons/Feather';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { FlatList, TouchableOpacity } from 'react-native';
@@ -71,9 +71,9 @@ export const RestaurantName = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bold};
 `;
 
-export const Icon = styled(FeatherIcon)`
-  color: ${({ theme }) => theme.colors.attention};
-  font-size: ${RFValue(24)}px;
+export const Icon = styled(MaterialIcons)`
+  color: ${({ theme }) => theme.colors.text_dark};
+  font-size: ${RFValue(28)}px;
 `;
 
 export const CategoriesListContainer = styled.View`

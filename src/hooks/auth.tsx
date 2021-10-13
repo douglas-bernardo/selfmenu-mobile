@@ -10,9 +10,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 
 export interface IRestaurant {
-  id: string;
-  name: string;
+  table_id: string;
+  table_number: number;
+  establishment_name: string;
   owner_id: string;
+  waiter: string;
 }
 
 interface AuthState {
@@ -27,7 +29,6 @@ interface AuthContextData {
   restaurant: IRestaurant;
   loading: boolean;
   signIn(restaurant: IRestaurant): Promise<void>;
-  // signIn(credentials: SignInCredentials): Promise<void>;
   signOut(): void;
   updateRestaurant(restaurant: IRestaurant): Promise<void>;
 }

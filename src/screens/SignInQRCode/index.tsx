@@ -21,6 +21,7 @@ const SignInQRCode: React.FC = () => {
         setRestaurant(response.data);
       })
       .catch(err => {
+        console.log(err.message);
         Alert.alert('Erro na leitura do QR Code');
       });
   }, []);
@@ -56,7 +57,7 @@ const SignInQRCode: React.FC = () => {
           bottomContent={
             restaurant && (
               <Button onPress={signInRestaurant}>
-                {`ir para ${restaurant.name}`}
+                {`ir para ${restaurant.establishment_name}`}
               </Button>
             )
           }
