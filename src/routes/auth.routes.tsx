@@ -9,7 +9,8 @@ const AuthRoutes: React.FC = () => (
   <Auth.Navigator
     screenOptions={{
       headerShown: false,
-      cardStyle: { backgroundColor: '#E5E9F2' },
+      animationEnabled: false,
+      cardStyle: { opacity: 1 },
     }}
   >
     <Auth.Screen name="SignInQRCode" component={SignInQRCode} />

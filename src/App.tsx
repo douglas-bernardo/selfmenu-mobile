@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
-import { StatusBar } from 'react-native';
+import { StatusBar, View } from 'react-native';
 
 import AppProvider from './hooks';
 import Routes from './routes';
@@ -16,7 +16,9 @@ const App: React.FC = () => (
       backgroundColor={theme.colors.background}
     />
     <AppProvider>
-      <Routes />
+      <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <Routes />
+      </View>
     </AppProvider>
   </ThemeProvider>
 );

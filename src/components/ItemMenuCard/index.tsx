@@ -1,4 +1,5 @@
 import React from 'react';
+import { RectButtonProps } from 'react-native-gesture-handler';
 
 import {
   Container,
@@ -20,13 +21,13 @@ export interface ItemMenuCardProps {
   price_formatted: string;
 }
 
-interface Props {
+interface Props extends RectButtonProps {
   data: ItemMenuCardProps;
 }
 
-const ItemMenuCard: React.FC<Props> = ({ data }) => {
+const ItemMenuCard: React.FC<Props> = ({ data, ...rest }) => {
   return (
-    <Container>
+    <Container {...rest}>
       <ItemPhoto
         source={{
           uri: data.url_photo,

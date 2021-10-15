@@ -3,7 +3,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { FlatList, TouchableOpacity } from 'react-native';
-import { Category, DataListProps } from '.';
+import { ICategory, DataListProps } from '.';
 
 interface CategoryContainerProps {
   selected: boolean;
@@ -20,7 +20,7 @@ export const Container = styled.View`
 
 export const Header = styled.View`
   width: 100%;
-  height: ${RFPercentage(25)}px;
+  height: ${RFPercentage(30)}px;
 
   background-color: ${({ theme }) => theme.colors.background};
 
@@ -58,6 +58,27 @@ export const Logo = styled.Image`
   border-radius: 10px;
 `;
 
+export const TableInfo = styled.View`
+  width: 100%;
+  position: absolute;
+
+  flex-direction: row;
+  justify-content: space-between;
+
+  padding: 0 24px;
+  bottom: 20px;
+`;
+
+export const WaiterName = styled.Text`
+  color: ${({ theme }) => theme.colors.attention};
+  font-family: ${({ theme }) => theme.fonts.bold};
+`;
+
+export const TableNumber = styled.Text`
+  color: ${({ theme }) => theme.colors.attention};
+  font-family: ${({ theme }) => theme.fonts.bold};
+`;
+
 export const Restaurant = styled.View`
   margin-left: 17px;
 `;
@@ -77,16 +98,12 @@ export const Icon = styled(MaterialIcons)`
 `;
 
 export const CategoriesListContainer = styled.View`
-  height: 120px;
+  padding: 24px;
   /* margin-top: -60px; */
 `;
 
-export const CategoriesList = styled(
-  FlatList as new () => FlatList<Category>,
-).attrs({
-  contentContainerStyle: { paddingLeft: 24 },
-})`
-  padding: 24px 0;
+export const CategoriesList = styled(FlatList as new () => FlatList<ICategory>)`
+  padding: 15px 0;
 `;
 
 export const CategoryContainer = styled(
@@ -102,6 +119,7 @@ export const CategoryContainer = styled(
   align-items: center;
   margin-right: 16px;
   border-radius: 16px;
+  height: 50px;
 `;
 
 export const CategoryName = styled.Text<CategoryNameProps>`
@@ -120,7 +138,7 @@ export const MenuItemsContainer = styled.View`
 export const Title = styled.Text`
   color: ${({ theme }) => theme.colors.text_dark};
   font-size: ${RFValue(18)}px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 `;
 
 export const MenuItemsList = styled(

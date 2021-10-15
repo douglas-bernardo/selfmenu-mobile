@@ -16,6 +16,9 @@ import {
   RestaurantWrapper,
   RestaurantInfo,
   LogOutButton,
+  TableInfo,
+  WaiterName,
+  TableNumber,
   Logo,
   Restaurant,
   RestaurantGreeting,
@@ -29,41 +32,41 @@ import {
   Title,
   MenuItemsList,
 } from './styles';
-import { RootStackParamList } from '../../routes/app.routes';
+import { HomeStackParamList } from '../../routes/app.routes';
 
-export interface Category {
+export interface ICategory {
   id: string;
   name: string;
 }
 
-interface Image {
+interface IImage {
   id: string;
   image_url: string;
 }
 
-interface MenuItem {
+export interface IMenuItem {
   id: string;
   name: string;
   description: string;
   price: number;
   price_formatted: string;
   url_photo: string;
-  images: Image[];
+  images: IImage[];
 }
 
 export interface DataListProps extends ItemMenuCardProps {
   id: string;
 }
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
 const Home: React.FC<Props> = ({ navigation }) => {
   const { restaurant, signOut } = useAuth();
   const theme = useTheme();
 
   const [selectedCategory, setSelectedCategory] = useState('0');
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
 
   useEffect(() => {
     api.get('/categories').then(response => {
@@ -74,7 +77,7 @@ const Home: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     api
-      .get<MenuItem[]>('/items', {
+      .get<IMenuItem[]>('/items', {
         params: {
           category: selectedCategory,
         },
@@ -95,6 +98,13 @@ const Home: React.FC<Props> = ({ navigation }) => {
   const handleSelectCategory = useCallback((categoryId: string) => {
     setSelectedCategory(categoryId);
   }, []);
+
+  const navigateToItemDetails = useCallback(
+    (itemId: string) => {
+      navigation.navigate('MenuItem', { itemId });
+    },
+    [navigation],
+  );
 
   return (
     <>
@@ -121,9 +131,14 @@ const Home: React.FC<Props> = ({ navigation }) => {
               <Icon name="qr-code-scanner" />
             </LogOutButton>
           </RestaurantWrapper>
+          <TableInfo>
+            <WaiterName>{`Garçom: ${restaurant.waiter}`}</WaiterName>
+            <TableNumber>{`Mesa: ${restaurant.table_number}`}</TableNumber>
+          </TableInfo>
         </Header>
 
         <CategoriesListContainer>
+          <Title>Categorias</Title>
           <CategoriesList
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -149,7 +164,12 @@ const Home: React.FC<Props> = ({ navigation }) => {
           <MenuItemsList
             data={menuItems}
             keyExtractor={item => item.id}
-            renderItem={({ item }) => <ItemMenuCard data={item} />}
+            renderItem={({ item }) => (
+              <ItemMenuCard
+                onPress={() => navigateToItemDetails(item.id)}
+                data={item}
+              />
+            )}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               paddingBottom: getBottomSpace(),

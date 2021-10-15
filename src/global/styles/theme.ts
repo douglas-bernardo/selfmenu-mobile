@@ -22,8 +22,5 @@ export default {
     regular: 'Poppins-Regular',
     medium: 'Poppins-Medium',
     bold: 'Poppins-Bold',
-    // regular: 'RobotoSlab-Regular',
-    // medium: 'RobotoSlab-Medium',
-    // bold: 'RobotoSlab-Bold',
   },
 };

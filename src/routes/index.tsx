@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { View, ActivityIndicator } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import AuthRoutes from './auth.routes';
 import AppRoutes from './app.routes';
 
@@ -26,7 +26,15 @@ const Routes: React.FC = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      theme={{
+        dark: false,
+        colors: {
+          ...DefaultTheme.colors,
+          background: '#fff',
+        },
+      }}
+    >
       {restaurant ? <AppRoutes /> : <AuthRoutes />}
     </NavigationContainer>
   );
