@@ -1,8 +1,12 @@
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 import Feather from 'react-native-vector-icons/Feather';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { RectButton } from 'react-native-gesture-handler';
+
+interface RemoveItemIconProps {
+  isEmpty: boolean;
+}
 
 export const Container = styled.View`
   flex: 1;
@@ -26,20 +30,39 @@ export const ItemWrapper = styled.View`
 
 export const BackButton = styled.TouchableOpacity`
   position: absolute;
+  width: ${RFValue(36)}px;
+  height: ${RFValue(36)}px;
+
   margin-top: ${getStatusBarHeight() + RFValue(20)}px;
   margin-left: ${RFValue(17)}px;
 
-  z-index: 1;
+  background: ${({ theme }) => theme.colors.shape};
+  border-radius: ${RFValue(18)}px;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 2;
 `;
 
-export const Icon = styled(Feather)`
-  color: ${({ theme }) => theme.colors.shape};
-  font-size: ${RFValue(35)}px;
+export const BackButtonIcon = styled(Feather)`
+  color: ${({ theme }) => theme.colors.text_dark};
+  font-size: ${RFValue(25)}px;
 `;
 
 export const ItemPhoto = styled.Image`
   width: 100%;
   height: 100%;
+`;
+
+export const DarkenCoverImg = styled.View`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+
+  /* justify-content: center;
+  align-items: center; */
+  z-index: 1;
 `;
 
 export const ItemInfoContainer = styled.View`
@@ -81,7 +104,7 @@ export const Rate = styled.Text`
   color: ${({ theme }) => theme.colors.text_dark};
 `;
 
-export const AddItemToOrderContainer = styled.View`
+export const CartItemControlContainer = styled.View`
   width: 100%;
   position: absolute;
   padding: 0 10px;
@@ -92,37 +115,43 @@ export const AddItemToOrderContainer = styled.View`
   bottom: ${RFValue(10)}px;
 `;
 
-export const AddControl = styled.View`
+export const QuantityControl = styled.View`
   flex: 1;
   height: 60px;
 
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-right: 15px;
+  margin-right: 20px;
 `;
 
-export const RemoveItemButton = styled.TouchableOpacity``;
+export const RemoveUnitButton = styled.TouchableOpacity``;
 
-export const RemoveItemIcon = styled(Feather)`
+export const RemoveUnitButtonIcon = styled(Feather)<RemoveItemIconProps>`
   color: ${({ theme }) => theme.colors.text_dark};
   font-size: ${RFValue(32)}px;
+
+  ${props =>
+    props.isEmpty &&
+    css`
+      color: #ccc;
+    `}
 `;
 
-export const TotalItemsText = styled.Text`
+export const TotalQuantityText = styled.Text`
   padding: 10px;
   color: ${({ theme }) => theme.colors.text_dark};
   font-family: ${({ theme }) => theme.fonts.bold};
 `;
 
-export const AddItemButton = styled.TouchableOpacity``;
+export const AddUnitButton = styled.TouchableOpacity``;
 
-export const AddItemIcon = styled(Feather)`
+export const AddUnitButtonIcon = styled(Feather)`
   color: ${({ theme }) => theme.colors.text_dark};
   font-size: ${RFValue(32)}px;
 `;
 
-export const AddItemOrderButton = styled(RectButton)`
+export const AddItemToCartButton = styled(RectButton)`
   padding: 0 15px;
   width: 65%;
   height: 60px;
@@ -134,13 +163,31 @@ export const AddItemOrderButton = styled(RectButton)`
   align-items: center;
 `;
 
-export const AddItemOrderButtonText = styled.Text`
+export const AddItemToCartButtonText = styled.Text`
   font-family: ${({ theme }) => theme.fonts.regular};
   color: ${({ theme }) => theme.colors.shape};
   font-size: 16px;
 `;
 
-export const ValueOrderTotalText = styled.Text`
+export const TotalItemValueText = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.regular};
+  color: ${({ theme }) => theme.colors.shape};
+  font-size: 16px;
+`;
+
+export const RemoveItemCartButton = styled(RectButton)`
+  padding: 0 15px;
+  width: 65%;
+  height: 60px;
+  background: ${({ theme }) => theme.colors.attention};
+  border-radius: 7px;
+
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const RemoveItemCartButtonText = styled.Text`
   font-family: ${({ theme }) => theme.fonts.regular};
   color: ${({ theme }) => theme.colors.shape};
   font-size: 16px;

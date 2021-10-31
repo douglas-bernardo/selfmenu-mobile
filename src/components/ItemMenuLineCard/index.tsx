@@ -19,7 +19,7 @@ export interface ItemMenuCardProps {
   id: string;
   name: string;
   category: ICategory;
-  url_photo: string;
+  photo_url: string;
 }
 
 interface Props extends TouchableOpacityProps {
@@ -35,7 +35,7 @@ const ItemMenuLineCard: React.FC<Props> = ({ data, ...rest }) => {
       </ItemContainer>
       <ItemPhoto
         source={{
-          uri: data.url_photo,
+          uri: data.photo_url,
         }}
       />
     </Container>

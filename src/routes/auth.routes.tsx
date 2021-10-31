@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import SignInQRCode from '../screens/SignInQRCode';
+import { SignInQRCode } from '../screens/SignInQRCode';
 
 const Auth = createStackNavigator();
 

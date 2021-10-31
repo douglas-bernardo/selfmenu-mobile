@@ -2,9 +2,9 @@ import React, { useCallback, useState, useEffect } from 'react';
 
 import { useTheme } from 'styled-components/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { StatusBar } from 'react-native';
+import { ActivityIndicator, Modal, StatusBar } from 'react-native';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
-import ItemMenuCard, { ItemMenuCardProps } from '../../components/ItemMenuCard';
+import ItemMenuCard from '../../components/ItemMenuCard';
 import { useAuth } from '../../hooks/auth';
 
 import api from '../../services/api';
@@ -32,79 +32,84 @@ import {
   Title,
   MenuItemsList,
 } from './styles';
-import { HomeStackParamList } from '../../routes/app.routes';
+
+import { StackParamList } from '../../routes/app.routes';
+import { CartModal } from '../CartModal';
+import { ShowCartButton } from '../../components/ShowCartButton';
+import { useCart } from '../../hooks/cart';
 
 export interface ICategory {
   id: string;
   name: string;
 }
 
-interface IImage {
-  id: string;
-  image_url: string;
-}
-
-export interface IMenuItem {
+export interface IProduct {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   price: number;
   price_formatted: string;
-  url_photo: string;
-  images: IImage[];
+  photo_url: string;
 }
 
-export interface DataListProps extends ItemMenuCardProps {
-  id: string;
-}
+type Props = NativeStackScreenProps<StackParamList>;
 
-type Props = NativeStackScreenProps<HomeStackParamList, 'HomeScreen'>;
-
-const Home: React.FC<Props> = ({ navigation }) => {
-  const { restaurant, signOut } = useAuth();
+export const Home: React.FC<Props> = ({ navigation }) => {
+  const { establishment, signOut } = useAuth();
+  const { cart_items, showCartModal, toggleCartModal } = useCart();
   const theme = useTheme();
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('0');
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
 
   useEffect(() => {
     api.get('/categories').then(response => {
       const categoriesApp = [{ id: '0', name: 'Todas' }, ...response.data];
       setCategories(categoriesApp);
+      setRefreshing(false);
     });
   }, []);
 
   useEffect(() => {
     api
-      .get<IMenuItem[]>('/items', {
+      .get<IProduct[]>('/products', {
         params: {
           category: selectedCategory,
         },
       })
       .then(response => {
-        const menuItemsFormatted = response.data.map(item => {
+        const productFormatted = response.data.map(item => {
           return {
             ...item,
             price_formatted: numberFormatAsCurrency(item.price),
-            url_photo: item.images[0].image_url,
           };
         });
 
-        setMenuItems(menuItemsFormatted);
+        setProducts(productFormatted);
+        setIsLoading(false);
+        setRefreshing(false);
       });
-  }, [selectedCategory]);
+  }, [selectedCategory, refreshing]);
 
   const handleSelectCategory = useCallback((categoryId: string) => {
     setSelectedCategory(categoryId);
+    setIsLoading(true);
   }, []);
 
   const navigateToItemDetails = useCallback(
     (itemId: string) => {
-      navigation.navigate('MenuItem', { itemId });
+      console.log(itemId);
+      navigation.navigate('Product', { item_id: itemId });
     },
     [navigation],
   );
+
+  const handleRefreshHomeApp = useCallback(() => {
+    setRefreshing(true);
+  }, []);
 
   return (
     <>
@@ -124,7 +129,9 @@ const Home: React.FC<Props> = ({ navigation }) => {
 
               <Restaurant>
                 <RestaurantGreeting>Bem vindo ao,</RestaurantGreeting>
-                <RestaurantName>{restaurant.establishment_name}</RestaurantName>
+                <RestaurantName>
+                  {establishment.establishment_name}
+                </RestaurantName>
               </Restaurant>
             </RestaurantInfo>
             <LogOutButton onPress={signOut}>
@@ -132,8 +139,8 @@ const Home: React.FC<Props> = ({ navigation }) => {
             </LogOutButton>
           </RestaurantWrapper>
           <TableInfo>
-            <WaiterName>{`Garçom: ${restaurant.waiter}`}</WaiterName>
-            <TableNumber>{`Mesa: ${restaurant.table_number}`}</TableNumber>
+            <WaiterName>{`Garçom: ${establishment.waiter}`}</WaiterName>
+            <TableNumber>{`Mesa: ${establishment.table_number}`}</TableNumber>
           </TableInfo>
         </Header>
 
@@ -155,30 +162,47 @@ const Home: React.FC<Props> = ({ navigation }) => {
                 </CategoryName>
               </CategoryContainer>
             )}
+            onRefresh={handleRefreshHomeApp}
+            refreshing={refreshing}
           />
+          <Title>Itens do Cardápio</Title>
         </CategoriesListContainer>
 
-        <MenuItemsContainer>
-          <Title>Itens do Cardápio</Title>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#999" />
+        ) : (
+          <MenuItemsContainer>
+            <MenuItemsList
+              data={products}
+              keyExtractor={product => product.id}
+              renderItem={({ item }) => (
+                <ItemMenuCard
+                  onPress={() => navigateToItemDetails(item.id)}
+                  data={item}
+                />
+              )}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: getBottomSpace(),
+              }}
+              onRefresh={handleRefreshHomeApp}
+              refreshing={refreshing}
+            />
+          </MenuItemsContainer>
+        )}
 
-          <MenuItemsList
-            data={menuItems}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <ItemMenuCard
-                onPress={() => navigateToItemDetails(item.id)}
-                data={item}
-              />
-            )}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingBottom: getBottomSpace(),
-            }}
+        <Modal visible={showCartModal} onRequestClose={toggleCartModal}>
+          <CartModal navigation={navigation} />
+        </Modal>
+
+        {cart_items.length > 0 && (
+          <ShowCartButton
+            onPress={toggleCartModal}
+            totalCartItems={cart_items.length}
+            cartItems={cart_items}
           />
-        </MenuItemsContainer>
+        )}
       </Container>
     </>
   );
 };
-
-export default Home;

@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useRoute } from '@react-navigation/native';
 import { Alert, StatusBar, ActivityIndicator, Modal } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
-import { HomeStackParamList } from '../../routes/app.routes';
 
 import {
   Container,
   Header,
   ItemWrapper,
   BackButton,
-  Icon,
+  BackButtonIcon,
   ItemPhoto,
   ItemInfoContainer,
   ItemContainer,
@@ -31,38 +30,49 @@ import {
   AddItemOrderButton,
   AddItemOrderButtonText,
   ValueOrderTotalText,
+  DarkenCoverImg,
 } from './styles';
-import { IMenuItem } from '../Home';
 import api from '../../services/api';
 import { numberFormatAsCurrency } from '../../utils/numberFormat';
 import InputItemDetails from '../../components/InputItemDetails';
-import MenuItemDetails from '../MenuItemDetails';
+import { StackParamList } from '../../routes/app.routes';
+import { ProductOptionsModal } from '../ProductOptionsModal';
+import { useCart } from '../../hooks/cart';
 
-interface RouteParams {
-  itemId: string;
+export interface IProduct {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  price_formatted: string;
+  photo_url: string;
 }
 
-type Props = NativeStackScreenProps<HomeStackParamList, 'MenuItem'>;
+interface RouteParams {
+  item_id: string;
+}
 
-const MenuItem: React.FC<Props> = ({ navigation }) => {
+type Props = NativeStackScreenProps<StackParamList>;
+
+export const Product: React.FC<Props> = ({ navigation }) => {
   const route = useRoute();
+  const { addItem } = useCart();
   const routeParams = route.params as RouteParams;
 
   const [itemDetailsModalOpen, setItemDetailsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [menuItem, setMenuItem] = useState<IMenuItem>({} as IMenuItem);
+  const [menuItem, setMenuItem] = useState<IProduct>({} as IProduct);
   const [quantity, setQuantity] = useState(1);
   const [valueOrderTotal, setValueOrderTotal] = useState(0);
   const [textItemDetails, setTextItemDetails] = useState('');
 
   useEffect(() => {
     api
-      .get<IMenuItem>(`/items/${routeParams.itemId}`)
+      .get<IProduct>(`/products/${routeParams.item_id}`)
       .then(response => {
         const menuItemFormatted = {
           ...response.data,
           price_formatted: numberFormatAsCurrency(response.data.price),
-          url_photo: response.data.images[0].image_url,
         };
 
         setMenuItem(menuItemFormatted);
@@ -74,7 +84,7 @@ const MenuItem: React.FC<Props> = ({ navigation }) => {
         console.log(err.message);
         Alert.alert('Erro ao consultar item do menu');
       });
-  }, [routeParams.itemId]);
+  }, [routeParams.item_id]);
 
   const handleRemoveItemQuantity = useCallback(() => {
     if (quantity === 1) return;
@@ -95,16 +105,23 @@ const MenuItem: React.FC<Props> = ({ navigation }) => {
     setItemDetailsModalOpen(!itemDetailsModalOpen);
   }, [itemDetailsModalOpen]);
 
-  const handleSubmitItem = useCallback(() => {
-    const data = {
-      item_id: menuItem.id,
+  const handleAddItemToCart = useCallback(() => {
+    addItem({
+      id: uuidv4(),
+      product: menuItem,
       quantity,
-      total: valueOrderTotal,
       details: textItemDetails,
-    };
-
-    console.log(data);
-  }, [menuItem.id, quantity, valueOrderTotal, textItemDetails]);
+      amount: valueOrderTotalFormatted,
+    });
+    navigation.goBack();
+  }, [
+    quantity,
+    textItemDetails,
+    addItem,
+    menuItem,
+    navigation,
+    valueOrderTotalFormatted,
+  ]);
 
   return (
     <>
@@ -120,13 +137,15 @@ const MenuItem: React.FC<Props> = ({ navigation }) => {
           <>
             <Header>
               <ItemWrapper>
-                <BackButton onPress={() => navigation.goBack()}>
-                  <Icon name="arrow-left-circle" />
-                </BackButton>
+                <DarkenCoverImg>
+                  <BackButton onPress={() => navigation.goBack()}>
+                    <BackButtonIcon name="arrow-left" />
+                  </BackButton>
+                </DarkenCoverImg>
 
                 <ItemPhoto
                   source={{
-                    uri: menuItem.url_photo,
+                    uri: menuItem.photo_url,
                   }}
                 />
               </ItemWrapper>
@@ -164,7 +183,7 @@ const MenuItem: React.FC<Props> = ({ navigation }) => {
                   <AddItemIcon name="plus-circle" />
                 </AddItemButton>
               </AddControl>
-              <AddItemOrderButton onPress={handleSubmitItem}>
+              <AddItemOrderButton onPress={handleAddItemToCart}>
                 <AddItemOrderButtonText>Adicionar</AddItemOrderButtonText>
                 <ValueOrderTotalText>
                   {valueOrderTotalFormatted}
@@ -178,7 +197,7 @@ const MenuItem: React.FC<Props> = ({ navigation }) => {
           visible={itemDetailsModalOpen}
           onRequestClose={() => console.log('close')}
         >
-          <MenuItemDetails
+          <ProductOptionsModal
             textItemDetails={textItemDetails}
             setMenuItemDetails={setTextItemDetails}
             toggleOpenMenuItemDetails={toggleModalItemDetails}
@@ -188,5 +207,3 @@ const MenuItem: React.FC<Props> = ({ navigation }) => {
     </>
   );
 };
-
-export default MenuItem;

@@ -4,21 +4,21 @@ import { StatusBar, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { BarCodeReadEvent, RNCamera } from 'react-native-camera';
 
-import { IRestaurant, useAuth } from '../../hooks/auth';
+import { IEstablishment, useAuth } from '../../hooks/auth';
 
 import { Container, Title } from './styles';
 import Button from '../../components/Button';
 import api from '../../services/api';
 
-const SignInQRCode: React.FC = () => {
+export const SignInQRCode: React.FC = () => {
   const { signIn } = useAuth();
-  const [restaurant, setRestaurant] = useState<IRestaurant>();
+  const [establishment, setEstablishment] = useState<IEstablishment>();
 
   const handleQRCodeScanner = useCallback((e: BarCodeReadEvent) => {
     api
-      .get<IRestaurant>(e.data)
+      .get<IEstablishment>(e.data)
       .then(response => {
-        setRestaurant(response.data);
+        setEstablishment(response.data);
       })
       .catch(err => {
         console.log(err.message);
@@ -26,11 +26,11 @@ const SignInQRCode: React.FC = () => {
       });
   }, []);
 
-  const signInRestaurant = useCallback(async () => {
-    if (restaurant) {
-      await signIn(restaurant);
+  const signInEstablishment = useCallback(async () => {
+    if (establishment) {
+      await signIn(establishment);
     }
-  }, [signIn, restaurant]);
+  }, [signIn, establishment]);
 
   return (
     <>
@@ -55,9 +55,9 @@ const SignInQRCode: React.FC = () => {
             width: '100%',
           }}
           bottomContent={
-            restaurant && (
-              <Button onPress={signInRestaurant}>
-                {`ir para ${restaurant.establishment_name}`}
+            establishment && (
+              <Button onPress={signInEstablishment}>
+                {`ir para ${establishment.establishment_name}`}
               </Button>
             )
           }
@@ -66,5 +66,3 @@ const SignInQRCode: React.FC = () => {
     </>
   );
 };
-
-export default SignInQRCode;

@@ -3,7 +3,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { FlatList, TouchableOpacity } from 'react-native';
-import { ICategory, DataListProps } from '.';
+import { ICategory, IProduct } from '.';
 
 interface CategoryContainerProps {
   selected: boolean;
@@ -20,7 +20,7 @@ export const Container = styled.View`
 
 export const Header = styled.View`
   width: 100%;
-  height: ${RFPercentage(30)}px;
+  height: ${RFPercentage(28)}px;
 
   background-color: ${({ theme }) => theme.colors.background};
 
@@ -99,7 +99,6 @@ export const Icon = styled(MaterialIcons)`
 
 export const CategoriesListContainer = styled.View`
   padding: 24px;
-  /* margin-top: -60px; */
 `;
 
 export const CategoriesList = styled(FlatList as new () => FlatList<ICategory>)`
@@ -138,9 +137,6 @@ export const MenuItemsContainer = styled.View`
 export const Title = styled.Text`
   color: ${({ theme }) => theme.colors.text_dark};
   font-size: ${RFValue(18)}px;
-  margin-bottom: 10px;
 `;
 
-export const MenuItemsList = styled(
-  FlatList as new () => FlatList<DataListProps>,
-)``;
+export const MenuItemsList = styled(FlatList as new () => FlatList<IProduct>)``;

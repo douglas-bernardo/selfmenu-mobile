@@ -21,7 +21,7 @@ interface IMenuDetails {
   toggleOpenMenuItemDetails: () => void;
 }
 
-const MenuItemDetails: React.FC<IMenuDetails> = ({
+export const ProductOptionsModal: React.FC<IMenuDetails> = ({
   textItemDetails,
   setMenuItemDetails,
   toggleOpenMenuItemDetails,
@@ -60,5 +60,3 @@ const MenuItemDetails: React.FC<IMenuDetails> = ({
     </>
   );
 };
-
-export default MenuItemDetails;

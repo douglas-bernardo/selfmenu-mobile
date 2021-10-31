@@ -1,28 +1,31 @@
 import React from 'react';
+
 import { useTheme } from 'styled-components';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
 import { Platform } from 'react-native';
-import Search from '../../../screens/Search';
-import Orders from '../../../screens/Orders';
-import Home from '../../../screens/Home';
+import { Search } from '../../../screens/Search';
+import { Orders } from '../../../screens/Orders';
+import { Home } from '../../../screens/Home';
+import { useCart } from '../../../hooks/cart';
 
-export type HomeTabParamList = {
-  Home: undefined;
-  Busca: undefined;
-  Pedidos: undefined;
-};
+// export type HomeTabParamList = {
+//   Home: undefined;
+//   Search: undefined;
+//   Pedidos: undefined;
+// };
 
-const { Navigator, Screen } = createBottomTabNavigator<HomeTabParamList>();
+const { Navigator, Screen } = createBottomTabNavigator();
 
-const HomeTabScreens: React.FC = () => {
+export const HomeTabScreens: React.FC = () => {
   const theme = useTheme();
+  const { cart_items } = useCart();
 
   return (
     <Navigator
       sceneContainerStyle={{
-        backgroundColor: '#fff',
+        backgroundColor: '#000',
       }}
       screenOptions={{
         headerShown: false,
@@ -59,11 +62,9 @@ const HomeTabScreens: React.FC = () => {
           tabBarIcon: ({ size, color }) => (
             <FeatherIcon name="file-text" size={size} color={color} />
           ),
-          tabBarBadge: 3,
+          tabBarBadge: cart_items.length > 0 ? cart_items.length : undefined,
         }}
       />
     </Navigator>
   );
 };
-
-export default HomeTabScreens;

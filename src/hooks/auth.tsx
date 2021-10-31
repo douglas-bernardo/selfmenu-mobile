@@ -9,28 +9,25 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 
-export interface IRestaurant {
+export interface IEstablishment {
   table_id: string;
   table_number: number;
-  establishment_name: string;
-  owner_id: string;
   waiter: string;
+  establishment_name: string;
+  establishment_id: string;
+  owner_id: string;
 }
 
 interface AuthState {
-  restaurant: IRestaurant;
-}
-
-interface SignInCredentials {
-  url_restaurant: string;
+  establishment: IEstablishment;
 }
 
 interface AuthContextData {
-  restaurant: IRestaurant;
+  establishment: IEstablishment;
   loading: boolean;
-  signIn(restaurant: IRestaurant): Promise<void>;
+  signIn(establishment: IEstablishment): Promise<void>;
   signOut(): void;
-  updateRestaurant(restaurant: IRestaurant): Promise<void>;
+  updateEstablishment(establishment: IEstablishment): Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextData>(
@@ -40,17 +37,17 @@ export const AuthContext = createContext<AuthContextData>(
 export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>({} as AuthState);
   const [loading, setLoading] = useState(true);
-  const asyncUser = '@SelfMenu:restaurant';
+  const asyncUser = '@SelfMenu:establishment';
 
   useEffect(() => {
     async function loadStorageData(): Promise<void> {
-      const restaurant = await AsyncStorage.getItem(asyncUser);
+      const establishment = await AsyncStorage.getItem(asyncUser);
 
-      if (restaurant) {
-        const loggedRestaurant: IRestaurant = JSON.parse(restaurant);
+      if (establishment) {
+        const loggedEstablishment: IEstablishment = JSON.parse(establishment);
 
-        api.defaults.headers.authorization = `Baerer ${loggedRestaurant.owner_id}`;
-        setData({ restaurant: loggedRestaurant });
+        api.defaults.headers.authorization = `Baerer ${loggedEstablishment.owner_id}`;
+        setData({ establishment: loggedEstablishment });
       }
       setLoading(false);
     }
@@ -58,11 +55,11 @@ export const AuthProvider: React.FC = ({ children }) => {
     loadStorageData();
   }, []);
 
-  const signIn = useCallback(async (restaurant: IRestaurant) => {
-    await AsyncStorage.setItem(asyncUser, JSON.stringify(restaurant));
+  const signIn = useCallback(async (establishment: IEstablishment) => {
+    await AsyncStorage.setItem(asyncUser, JSON.stringify(establishment));
 
-    api.defaults.headers.authorization = `Baerer ${restaurant.owner_id}`;
-    setData({ restaurant });
+    api.defaults.headers.authorization = `Baerer ${establishment.owner_id}`;
+    setData({ establishment });
   }, []);
 
   const signOut = useCallback(async () => {
@@ -71,10 +68,10 @@ export const AuthProvider: React.FC = ({ children }) => {
     setData({} as AuthState);
   }, []);
 
-  const updateRestaurant = useCallback(
-    async (restaurant: IRestaurant) => {
-      await AsyncStorage.setItem(asyncUser, JSON.stringify(restaurant));
-      setData({ restaurant });
+  const updateEstablishment = useCallback(
+    async (establishment: IEstablishment) => {
+      await AsyncStorage.setItem(asyncUser, JSON.stringify(establishment));
+      setData({ establishment });
     },
     [setData],
   );
@@ -82,11 +79,11 @@ export const AuthProvider: React.FC = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        restaurant: data.restaurant,
+        establishment: data.establishment,
         loading,
         signIn,
         signOut,
-        updateRestaurant,
+        updateEstablishment,
       }}
     >
       {children}

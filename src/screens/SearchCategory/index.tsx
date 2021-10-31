@@ -6,7 +6,9 @@ import {
   TextInputSubmitEditingEventData,
   Modal,
 } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { getBottomSpace } from 'react-native-iphone-x-helper';
 
 import {
   Container,
@@ -15,47 +17,67 @@ import {
   OpenSearchItemsModalButtonText,
   InputSearchIcon,
   Title,
-  CategoriesListContainer,
-  CategoriesList,
-  CategoryContainer,
-  CategoryName,
-  CategoryCover,
-  DarkenImg,
+  MenuItemsContainer,
+  MenuItemsList,
 } from './styles';
 
+import ItemMenuCard from '../../components/ItemMenuCard';
+
 import api from '../../services/api';
+import { IProduct } from '../Home';
+import { numberFormatAsCurrency } from '../../utils/numberFormat';
 import { StackParamList } from '../../routes/app.routes';
 import { SearchProductsModal } from '../SearchProductsModal';
-import { CartModal } from '../CartModal';
 import { useCart } from '../../hooks/cart';
+import { CartModal } from '../CartModal';
 import { ShowCartButton } from '../../components/ShowCartButton';
 
 export interface ICategorySearch {
-  id: number;
+  id: string;
   name: string;
   image_cover_url?: string;
 }
 
+interface RouteParams {
+  category_id: number;
+  category_name: string;
+}
+
 type Props = NativeStackScreenProps<StackParamList>;
 
-export const Search: React.FC<Props> = ({ navigation }) => {
+export const SearchCategory: React.FC<Props> = ({ navigation }) => {
   const { cart_items, showCartModal, toggleCartModal } = useCart();
+  const route = useRoute();
+  const { category_id, category_name } = route.params as RouteParams;
 
   const [showModalSearch, setShowModalSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [categories, setCategories] = useState<ICategorySearch[]>([]);
 
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [menuItems, setMenuItems] = useState<IProduct[]>([]);
+
   useEffect(() => {
-    api.get('/categories').then(response => {
-      const { data } = response;
-      setCategories(data);
-      setIsLoading(false);
-      setRefreshing(false);
-    });
-  }, [refreshing]);
+    api
+      .get<IProduct[]>('/products', {
+        params: {
+          category: category_id,
+        },
+      })
+      .then(response => {
+        const menuItemsFormatted = response.data.map(item => {
+          return {
+            ...item,
+            price_formatted: numberFormatAsCurrency(item.price),
+          };
+        });
+
+        setMenuItems(menuItemsFormatted);
+        setIsLoading(false);
+        setRefreshing(false);
+      });
+  }, [category_id, refreshing]);
 
   const handleSubmitSearch = useCallback(
     (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
@@ -72,9 +94,9 @@ export const Search: React.FC<Props> = ({ navigation }) => {
     setRefreshing(true);
   }, []);
 
-  const navigateToSearchCategory = useCallback(
-    (category_id: number, category_name: string) => {
-      navigation.navigate('SearchCategory', { category_id, category_name });
+  const navigateToItemDetails = useCallback(
+    (itemId: string) => {
+      navigation.navigate('Product', { item_id: itemId });
     },
     [navigation],
   );
@@ -85,41 +107,36 @@ export const Search: React.FC<Props> = ({ navigation }) => {
         <OpenSearchItemsModalButton onPress={toggleModalSearchItems}>
           <InputSearchIcon name="search" />
           <OpenSearchItemsModalButtonText>
-            {searchTerm || 'Itens do menu'}
+            {searchTerm || 'Itens por categoria'}
           </OpenSearchItemsModalButtonText>
         </OpenSearchItemsModalButton>
       </Header>
-      <Title>Categorias</Title>
-      <CategoriesListContainer>
+      <Title>{category_name}</Title>
+
+      <MenuItemsContainer>
         {isLoading && <ActivityIndicator size="large" color="#999" />}
-        <CategoriesList
-          data={categories}
-          numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
-          keyExtractor={category => String(category.id)}
-          renderItem={({ item: category }) => (
-            <CategoryContainer
-              onPress={() =>
-                navigateToSearchCategory(category.id, category.name)
-              }
-            >
-              <DarkenImg>
-                <CategoryName>{category.name}</CategoryName>
-              </DarkenImg>
-              <CategoryCover
-                source={{
-                  uri: category.image_cover_url,
-                }}
-              />
-            </CategoryContainer>
+        <MenuItemsList
+          data={menuItems}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <ItemMenuCard
+              onPress={() => navigateToItemDetails(item.id)}
+              data={item}
+            />
           )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: getBottomSpace(),
+          }}
           onRefresh={handleOnRefreshCategoryList}
           refreshing={refreshing}
         />
-      </CategoriesListContainer>
-      <Modal visible={showModalSearch}>
+      </MenuItemsContainer>
+
+      <Modal style={{ flex: 1 }} visible={showModalSearch}>
         <SearchProductsModal
           searchTerm={searchTerm}
+          categoryId={category_id}
           setSearchTerm={setSearchTerm}
           onSubmitSearch={handleSubmitSearch}
           toggleOpenSearchModal={toggleModalSearchItems}

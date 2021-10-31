@@ -6,7 +6,6 @@ import {
   StatusBar,
   TextInputSubmitEditingEventData,
   KeyboardAvoidingView,
-  ScrollView,
   Platform,
 } from 'react-native';
 
@@ -30,21 +29,16 @@ interface ICategory {
   name: string;
 }
 
-interface IImage {
-  id: string;
-  image_url: string;
-}
-
 export interface IItemMenuSearchResults {
   id: string;
   name: string;
   category: ICategory;
-  url_photo: string;
-  images: IImage[];
+  photo_url: string;
 }
 
 interface ISearchItemsModal {
   searchTerm?: string;
+  categoryId?: number;
   setSearchTerm: (text: string) => void;
   onSubmitSearch: (
     e: NativeSyntheticEvent<TextInputSubmitEditingEventData>,
@@ -53,8 +47,9 @@ interface ISearchItemsModal {
   navigation: any;
 }
 
-const SearchItemsModal: React.FC<ISearchItemsModal> = ({
+export const SearchProductsModal: React.FC<ISearchItemsModal> = ({
   searchTerm,
+  categoryId,
   setSearchTerm,
   onSubmitSearch,
   toggleOpenSearchModal,
@@ -69,22 +64,16 @@ const SearchItemsModal: React.FC<ISearchItemsModal> = ({
   useEffect(() => {
     if (term.length < 1) return;
     api
-      .get<IItemMenuSearchResults[]>('items/search', {
+      .get<IItemMenuSearchResults[]>('products/search', {
         params: {
           name: term,
+          category_id: categoryId,
         },
       })
       .then(response => {
-        const itemsFormatted = response.data.map(item => {
-          return {
-            ...item,
-            url_photo: item.images[0].image_url,
-          };
-        });
-
-        setSearchResults(itemsFormatted);
+        setSearchResults(response.data);
       });
-  }, [term]);
+  }, [term, categoryId]);
 
   const handleSaveInputItemDetails = useCallback(
     (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
@@ -111,7 +100,7 @@ const SearchItemsModal: React.FC<ISearchItemsModal> = ({
   const navigateToItemDetails = useCallback(
     (itemId: string) => {
       toggleOpenSearchModal();
-      navigation.navigate('MenuItem', { itemId });
+      navigation.navigate('Product', { item_id: itemId });
     },
     [navigation, toggleOpenSearchModal],
   );
@@ -165,5 +154,3 @@ const SearchItemsModal: React.FC<ISearchItemsModal> = ({
     </>
   );
 };
-
-export default SearchItemsModal;

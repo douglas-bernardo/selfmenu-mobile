@@ -11,7 +11,7 @@ interface Props extends RectButtonProps {
 const InputItemDetails: React.FC<Props> = ({ textDetails, onPress }) => {
   return (
     <Container>
-      <Title>Alguma Observação?</Title>
+      <Title>Observações:</Title>
       <TextDetailsContainer onPress={onPress}>
         <TextDetails>{textDetails}</TextDetails>
       </TextDetailsContainer>

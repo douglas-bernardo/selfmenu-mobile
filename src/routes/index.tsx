@@ -8,7 +8,7 @@ import AppRoutes from './app.routes';
 import { useAuth } from '../hooks/auth';
 
 const Routes: React.FC = () => {
-  const { restaurant, loading } = useAuth();
+  const { establishment, loading } = useAuth();
 
   if (loading) {
     return (
@@ -35,7 +35,7 @@ const Routes: React.FC = () => {
         },
       }}
     >
-      {restaurant ? <AppRoutes /> : <AuthRoutes />}
+      {establishment ? <AppRoutes /> : <AuthRoutes />}
     </NavigationContainer>
   );
 };

@@ -2,8 +2,8 @@ import styled from 'styled-components/native';
 
 import Feather from 'react-native-vector-icons/Feather';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { FlatList, TouchableOpacity } from 'react-native';
-import { ICategorySearch } from '.';
+import { FlatList } from 'react-native';
+import { IProduct } from '../Home';
 
 export const Container = styled.View`
   flex: 1;
@@ -55,51 +55,11 @@ export const Title = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bold};
 `;
 
-export const CategoriesListContainer = styled.View`
+export const MenuItemsContainer = styled.View`
   flex: 1;
-  align-items: center;
+
+  margin-top: 15px;
+  padding: 0 24px;
 `;
 
-export const CategoriesList = styled(
-  FlatList as new () => FlatList<ICategorySearch>,
-)`
-  margin-top: 20px;
-`;
-
-export const CategoryContainer = styled(TouchableOpacity)`
-  width: ${RFValue(150)}px;
-  height: ${RFValue(150)}px;
-
-  justify-content: center;
-  align-items: center;
-
-  margin-bottom: 10px;
-  margin-left: 10px;
-  border-radius: 8px;
-`;
-
-export const DarkenImg = styled.View`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 8px;
-  z-index: 1;
-`;
-
-export const CategoryName = styled.Text`
-  color: ${({ theme }) => theme.colors.shape};
-
-  font-family: ${({ theme }) => theme.fonts.bold};
-`;
-
-export const CategoryCover = styled.Image`
-  width: 100%;
-  height: 100%;
-
-  border-radius: 8px;
-`;
+export const MenuItemsList = styled(FlatList as new () => FlatList<IProduct>)``;
