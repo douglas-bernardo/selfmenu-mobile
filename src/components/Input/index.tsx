@@ -9,7 +9,8 @@ import React, {
 import { TextInputProps } from 'react-native';
 import { useField } from '@unform/core';
 
-import { Container, TextInput, Icon } from './styles';
+import { useTheme } from 'styled-components/native';
+import { Container, TextInput, Icon, TextError } from './styles';
 
 interface InputProps extends TextInputProps {
   name: string;
@@ -29,6 +30,7 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
   { name, icon, containerStyle = {}, ...rest },
   ref,
 ) => {
+  const theme = useTheme();
   const inputElementRef = useRef<any>(null);
 
   const { registerField, defaultValue = '', fieldName, error } = useField(name);
@@ -74,12 +76,12 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
       <Icon
         name={icon}
         size={20}
-        color={isFocused || isFilled ? '#ff9000' : '#666360'}
+        color={isFocused || isFilled ? '#ff9000' : theme.colors.text}
       />
       <TextInput
         ref={inputElementRef}
         keyboardAppearance="dark"
-        placeholderTextColor="#666360"
+        placeholderTextColor={theme.colors.text}
         defaultValue={defaultValue}
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
@@ -88,6 +90,7 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
         }}
         {...rest}
       />
+      {error && <TextError>{error}</TextError>}
     </Container>
   );
 };

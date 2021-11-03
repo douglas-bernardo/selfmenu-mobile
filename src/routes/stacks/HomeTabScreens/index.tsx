@@ -8,19 +8,13 @@ import { Platform } from 'react-native';
 import { Search } from '../../../screens/Search';
 import { Orders } from '../../../screens/Orders';
 import { Home } from '../../../screens/Home';
-import { useCart } from '../../../hooks/cart';
-
-// export type HomeTabParamList = {
-//   Home: undefined;
-//   Search: undefined;
-//   Pedidos: undefined;
-// };
+import { useOrder } from '../../../hooks/order';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
 export const HomeTabScreens: React.FC = () => {
   const theme = useTheme();
-  const { cart_items } = useCart();
+  const { orders } = useOrder();
 
   return (
     <Navigator
@@ -62,7 +56,7 @@ export const HomeTabScreens: React.FC = () => {
           tabBarIcon: ({ size, color }) => (
             <FeatherIcon name="file-text" size={size} color={color} />
           ),
-          tabBarBadge: cart_items.length > 0 ? cart_items.length : undefined,
+          tabBarBadge: orders.length > 0 ? orders.length : undefined,
         }}
       />
     </Navigator>

@@ -91,6 +91,9 @@ export const Home: React.FC<Props> = ({ navigation }) => {
         setProducts(productFormatted);
         setIsLoading(false);
         setRefreshing(false);
+      })
+      .catch(error => {
+        console.log(error);
       });
   }, [selectedCategory, refreshing]);
 

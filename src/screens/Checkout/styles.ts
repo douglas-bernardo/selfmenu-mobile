@@ -1,14 +1,13 @@
 import styled from 'styled-components/native';
 
-import { FlatList } from 'react-native';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
-import { IItemCart } from '../../components/ItemCart';
 
 export const Container = styled.View`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.shape};
+  margin-bottom: 10px;
 `;
 
 export const Header = styled.View`
@@ -28,8 +27,26 @@ export const HeaderTopInfo = styled.View`
   margin-top: ${getStatusBarHeight() + RFValue(10)}px;
 
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+`;
+
+export const GoBackButton = styled.TouchableOpacity``;
+
+export const HideModalButtonIcon = styled(MaterialIcons)`
+  color: ${({ theme }) => theme.colors.attention};
+  font-size: ${RFValue(32)}px;
+`;
+
+export const HeaderTitle = styled.Text`
+  width: 90%;
+  color: ${({ theme }) => theme.colors.text_dark};
+  font-family: ${({ theme }) => theme.fonts.medium};
+  font-size: ${RFValue(15)}px;
+
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 `;
 
 export const EstablishmentInfo = styled.View`
@@ -43,31 +60,26 @@ export const EstablishmentInfo = styled.View`
   bottom: 20px;
 `;
 
-export const TableNumberText = styled.Text`
-  color: ${({ theme }) => theme.colors.attention};
-  font-family: ${({ theme }) => theme.fonts.bold};
-`;
-
 export const WaiterName = styled.Text`
   color: ${({ theme }) => theme.colors.attention};
   font-family: ${({ theme }) => theme.fonts.bold};
 `;
 
-export const HideModalButton = styled.TouchableOpacity``;
-
-export const HideModalButtonIcon = styled(MaterialIcons)`
+export const TableNumberText = styled.Text`
   color: ${({ theme }) => theme.colors.attention};
-  font-size: ${RFValue(32)}px;
+  font-family: ${({ theme }) => theme.fonts.bold};
 `;
 
-export const ClearCartButton = styled.TouchableOpacity``;
+export const SecurityContainer = styled.View`
+  padding: 24px;
+`;
 
-export const ClearCartButtonText = styled.Text`
-  font-size: ${RFValue(12)}px;
-  color: ${({ theme }) => theme.colors.attention};
-  font-family: ${({ theme }) => theme.fonts.medium};
+export const CartItemsListHeader = styled.View`
+  width: 100%;
 
-  margin-left: 10px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 export const Title = styled.Text`
@@ -79,25 +91,16 @@ export const Title = styled.Text`
   justify-content: center;
 `;
 
-export const CartItemsContainer = styled.View`
-  padding: 24px;
-`;
-
-export const CartItemsList = styled(FlatList as new () => FlatList<IItemCart>)`
-  margin-top: 10px;
-`;
-
-export const CartItemsListHeader = styled.View`
-  width: 100%;
-
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+export const FormContainer = styled.View`
+  flex: 1;
+  padding: 0 24px;
 `;
 
 export const Footer = styled.View`
   position: absolute;
+
   width: 100%;
-  padding: 20px;
-  bottom: ${RFValue(10)}px;
+  padding: 0 24px;
+
+  bottom: ${RFValue(20)}px;
 `;

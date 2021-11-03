@@ -3,7 +3,6 @@ import React from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { StackParamList } from '../../routes/app.routes';
-import { useCart } from '../../hooks/cart';
 
 import {
   Container,
@@ -16,11 +15,12 @@ import {
   OrdersContainer,
   Title,
 } from './styles';
+import { useOrder } from '../../hooks/order';
 
 type Props = NativeStackScreenProps<StackParamList>;
 
 export const Orders: React.FC<Props> = () => {
-  const { cart_items } = useCart();
+  const { orders } = useOrder();
   return (
     <Container>
       <Header>
@@ -34,7 +34,7 @@ export const Orders: React.FC<Props> = () => {
       </Header>
 
       <OrdersContainer>
-        <Title>{`Existem ${cart_items.length} itens em sua sacola.`}</Title>
+        <Title>{`Você tem um total de ${orders.length} pedidos.`}</Title>
       </OrdersContainer>
     </Container>
   );

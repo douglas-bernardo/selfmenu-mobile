@@ -10,11 +10,11 @@ export const Container = styled.View<InputProps>`
   width: 100%;
   height: 60px;
   padding: 0 16px;
-  background: #232129;
+  background: ${({ theme }) => theme.colors.shape};
   border-radius: 10px;
   margin-bottom: 8px;
   border-width: 2px;
-  border-color: #232129;
+  border-color: ${({ theme }) => theme.colors.title};
 
   flex-direction: row;
   align-items: center;
@@ -34,11 +34,18 @@ export const Container = styled.View<InputProps>`
 
 export const TextInput = styled.TextInput`
   flex: 1;
-  color: #fff;
+  color: ${({ theme }) => theme.colors.text_dark};
   font-size: 16px;
-  font-family: 'RobotoSlab-Regular';
+  font-family: ${({ theme }) => theme.fonts.regular};
 `;
 
 export const Icon = styled(FeatherIcon)`
   margin-right: 16px;
+`;
+
+export const TextError = styled.Text`
+  position: absolute;
+  bottom: -30px;
+  color: #c53030;
+  font-family: ${({ theme }) => theme.fonts.bold};
 `;
