@@ -104,7 +104,6 @@ export const Home: React.FC<Props> = ({ navigation }) => {
 
   const navigateToItemDetails = useCallback(
     (itemId: string) => {
-      console.log(itemId);
       navigation.navigate('Product', { item_id: itemId });
     },
     [navigation],
@@ -113,6 +112,10 @@ export const Home: React.FC<Props> = ({ navigation }) => {
   const handleRefreshHomeApp = useCallback(() => {
     setRefreshing(true);
   }, []);
+
+  const handleSignOut = useCallback(() => {
+    signOut();
+  }, [signOut]);
 
   return (
     <>
@@ -137,7 +140,7 @@ export const Home: React.FC<Props> = ({ navigation }) => {
                 </RestaurantName>
               </Restaurant>
             </RestaurantInfo>
-            <LogOutButton onPress={signOut}>
+            <LogOutButton onPress={handleSignOut}>
               <Icon name="qr-code-scanner" />
             </LogOutButton>
           </RestaurantWrapper>

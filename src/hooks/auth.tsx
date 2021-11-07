@@ -12,6 +12,7 @@ import api from '../services/api';
 export interface IEstablishment {
   table_id: string;
   table_number: number;
+  table_token: string;
   waiter: string;
   establishment_name: string;
   establishment_id: string;

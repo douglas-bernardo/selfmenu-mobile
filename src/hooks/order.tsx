@@ -7,25 +7,17 @@ import React, {
   useState,
 } from 'react';
 import api from '../services/api';
-import { useAuth } from './auth';
-import { useCart } from './cart';
-
-interface IOrderProduct {
-  id: string;
-  product_id: string;
-  details: string;
-  price: number;
-  quantity: number;
-  order_id: string;
-}
 
 interface IOrder {
   id: string;
   table_token: string;
-  costumer_name: string;
+  customer_name: string;
   status_order_id: number;
   establishment_id: string;
-  order_products: IOrderProduct[];
+}
+
+interface IOrderState {
+  orders: IOrder[];
 }
 
 interface IProduct {
@@ -36,18 +28,16 @@ interface IProduct {
 
 interface ICreateOrderDTO {
   table_token: string;
-  costumer_name: string;
+  customer_name: string;
   establishment_id: string;
   products: IProduct[];
 }
 
-interface IOrderState {
-  orders: IOrder[];
-}
-
 interface IOrderContextData {
   orders: IOrder[];
+  current_token_table: string;
   createOrder(order: ICreateOrderDTO): Promise<void>;
+  clearOrders(): Promise<void>;
 }
 
 export const OrderContext = createContext<IOrderContextData>(
@@ -55,40 +45,62 @@ export const OrderContext = createContext<IOrderContextData>(
 );
 
 export const OrderProvider: React.FC = ({ children }) => {
-  const { establishment } = useAuth();
+  const [currentTableToken, setCurrentTableToken] = useState('');
   const [data, setData] = useState<IOrderState>({ orders: [] } as IOrderState);
+  const asyncTableToken = '@SelfMenu:tableToken';
+  const asyncTableOrders = '@SelfMenu:tableOrders';
 
   useEffect(() => {
-    if (establishment) {
-      api
-        .get<IOrder[]>('/orders', {
-          params: {
-            table_id: establishment.table_id,
-          },
-        })
-        .then(response => {
-          setData({
-            orders: response.data,
-          });
-        })
-        .catch(err => {
-          console.log(err.message);
-        });
-    }
-  }, [establishment]);
+    async function loadStorageData(): Promise<void> {
+      const [table_token, orders] = await AsyncStorage.multiGet([
+        asyncTableToken,
+        asyncTableOrders,
+      ]);
 
-  const createOrder = useCallback(async (order: ICreateOrderDTO) => {
-    const response = await api.post<IOrder>('/orders', order);
-    console.log(response);
-    setData(prevState => {
-      return {
-        orders: [...prevState.orders, response.data],
-      };
-    });
+      if (table_token[1] && orders[1]) {
+        setCurrentTableToken(table_token[1]);
+        setData({ orders: JSON.parse(orders[1]) });
+      }
+    }
+
+    loadStorageData();
+  }, []);
+
+  const createOrder = useCallback(
+    async (order: ICreateOrderDTO) => {
+      const response = await api.post<IOrder>('/orders', order);
+
+      await AsyncStorage.multiSet([
+        [asyncTableToken, response.data.table_token],
+        [asyncTableOrders, JSON.stringify([...data.orders, response.data])],
+      ]);
+
+      setCurrentTableToken(response.data.table_token);
+
+      setData(prevState => {
+        return {
+          orders: [...prevState.orders, response.data],
+        };
+      });
+    },
+    [data.orders],
+  );
+
+  const clearOrders = useCallback(async () => {
+    await AsyncStorage.multiRemove([asyncTableToken, asyncTableOrders]);
+
+    setData({ orders: [] });
   }, []);
 
   return (
-    <OrderContext.Provider value={{ orders: data.orders, createOrder }}>
+    <OrderContext.Provider
+      value={{
+        orders: data.orders,
+        current_token_table: currentTableToken,
+        createOrder,
+        clearOrders,
+      }}
+    >
       {children}
     </OrderContext.Provider>
   );

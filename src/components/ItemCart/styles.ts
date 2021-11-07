@@ -14,7 +14,7 @@ export const Container = styled(TouchableOpacity)`
 
 export const ItemContainer = styled.View`
   flex: 1;
-  margin-left: 17px;
+  /* margin-left: 17px; */
 `;
 
 export const ItemName = styled.Text`

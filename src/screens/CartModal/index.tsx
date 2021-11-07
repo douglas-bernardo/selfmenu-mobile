@@ -120,7 +120,7 @@ export const CartModal: React.FC<ICartModal> = ({ navigation }) => {
         </CartItemsContainer>
 
         <Footer>
-          <Button onPress={handleGoToCheckout}>Fazer Pedido</Button>
+          <Button onPress={handleGoToCheckout}>Finalizar Pedido</Button>
         </Footer>
       </Container>
     </>

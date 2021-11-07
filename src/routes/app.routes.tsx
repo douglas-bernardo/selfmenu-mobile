@@ -7,6 +7,7 @@ import { SearchCategory } from '../screens/SearchCategory';
 import { Product } from '../screens/Product';
 import { ProductUpdate } from '../screens/ProductUpdate';
 import { Checkout } from '../screens/Checkout';
+import { OrderDetails } from '../screens/OrderDetails';
 
 export type StackParamList = {
   HomeScreen: undefined;
@@ -15,6 +16,7 @@ export type StackParamList = {
   SearchCategory: { category_id: number; category_name: string };
   Checkout: undefined;
   Pedidos: undefined;
+  OrderDetails: { order_id: string };
 };
 
 const { Navigator, Screen } = createStackNavigator();
@@ -33,6 +35,7 @@ const AppRoutes: React.FC = () => {
       <Screen name="ProductUpdate" component={ProductUpdate} />
       <Screen name="SearchCategory" component={SearchCategory} />
       <Screen name="Checkout" component={Checkout} />
+      <Screen name="OrderDetails" component={OrderDetails} />
     </Navigator>
   );
 };

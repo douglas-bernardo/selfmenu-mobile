@@ -5,10 +5,10 @@ const api = axios.create({
 });
 
 // debug request
-api.interceptors.request.use(request => {
-  console.log('Starting Request', JSON.stringify(request, null, 2));
-  return request;
-});
+// api.interceptors.request.use(request => {
+//   console.log('Starting Request', JSON.stringify(request, null, 2));
+//   return request;
+// });
 
 export default api;
 

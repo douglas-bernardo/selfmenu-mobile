@@ -3,7 +3,7 @@ import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { FlatList, TouchableOpacity } from 'react-native';
 
-import { IOrder } from './index';
+import { IOrderProducts } from './index';
 
 export const Container = styled.View`
   flex: 1;
@@ -12,9 +12,9 @@ export const Container = styled.View`
 
 export const Header = styled.View`
   width: 100%;
-  height: ${RFPercentage(30)}px;
+  height: ${RFPercentage(20)}px;
 
-  background-color: ${({ theme }) => theme.colors.shape};
+  background-color: ${({ theme }) => theme.colors.background};
 
   justify-content: center;
   align-items: flex-start;
@@ -26,18 +26,9 @@ export const TableInfoWrapper = styled.View`
   padding: 0 24px;
   margin-top: ${getStatusBarHeight() + RFValue(10)}px;
 
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-`;
-
-export const Logo = styled.Image`
-  width: ${RFValue(60)}px;
-  height: ${RFValue(60)}px;
-
-  border-width: 1px;
-  border-color: ${({ theme }) => theme.colors.attention};
-  border-radius: 10px;
 `;
 
 export const TableIdentify = styled.Text`
@@ -76,11 +67,27 @@ export const Title = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bold};
 `;
 
-export const OrderItemsList = styled(FlatList as new () => FlatList<IOrder>)`
+export const OrderStatusText = styled.Text`
+  color: ${({ theme }) => theme.colors.primary};
+  font-family: ${({ theme }) => theme.fonts.medium};
+`;
+
+export const CartItemsListHeader = styled.View`
+  width: 100%;
+
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+`;
+
+export const OrderItemsList = styled(
+  FlatList as new () => FlatList<IOrderProducts>,
+)`
   margin-top: 20px;
 `;
 
-export const OrderContainer = styled(TouchableOpacity)`
+export const ProductContainer = styled.View`
   flex-direction: row;
   padding: 10px;
   background: ${({ theme }) => theme.colors.background};
@@ -91,21 +98,21 @@ export const OrderContainer = styled(TouchableOpacity)`
   justify-content: space-between;
 `;
 
-export const OrderResume = styled.View`
+export const ProductResume = styled.View`
   width: 70%;
 `;
 
-export const ItemsResume = styled.View`
-  flex-direction: row;
-`;
-
-export const CostumerName = styled.Text`
+export const ProductName = styled.Text`
   color: ${({ theme }) => theme.colors.text_dark};
-  font-family: ${({ theme }) => theme.fonts.bold};
+  font-family: ${({ theme }) => theme.fonts.regular};
   font-size: ${RFValue(14)}px;
 `;
 
-export const ItemsQuantity = styled.Text`
+export const ProductResumeSummary = styled.View`
+  flex-direction: row;
+`;
+
+export const ProductQuantity = styled.Text`
   color: ${({ theme }) => theme.colors.text_dark};
   font-family: ${({ theme }) => theme.fonts.regular};
   font-size: ${RFValue(10)}px;
@@ -118,14 +125,14 @@ export const Amount = styled.Text`
   font-size: ${RFValue(10)}px;
 `;
 
-export const OrderStatus = styled.View`
+export const OrderActions = styled(TouchableOpacity)`
   width: 30%;
   justify-content: center;
   align-items: center;
 `;
 
-export const OrderStatusText = styled.Text`
-  color: ${({ theme }) => theme.colors.text_dark};
+export const OrderActionText = styled.Text`
+  color: ${({ theme }) => theme.colors.attention};
   font-family: ${({ theme }) => theme.fonts.regular};
   font-size: ${RFValue(8)}px;
 

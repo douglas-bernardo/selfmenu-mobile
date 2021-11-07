@@ -32,7 +32,6 @@ import {
   Title,
   SecurityContainer,
   FormContainer,
-  Footer,
   CartItemsListHeader,
 } from './styles';
 import { getValidationErrors } from '../../utils/getValidationErrors';
@@ -41,7 +40,7 @@ import { useOrder } from '../../hooks/order';
 
 interface CreateOrderFormData {
   table_token: string;
-  costumer_name: string;
+  customer_name: string;
 }
 
 interface ICartModal {
@@ -81,7 +80,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
-          costumer_name: Yup.string().required('Nome é obrigatório'),
+          customer_name: Yup.string().required('Nome é obrigatório'),
           table_token: Yup.string().required('Código da mesa é obrigatório'),
         });
 
@@ -89,7 +88,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
 
         const order = {
           table_token: data.table_token,
-          costumer_name: data.costumer_name,
+          customer_name: data.customer_name,
           establishment_id: establishment.establishment_id,
           products: cart_items.map(item => {
             return {
@@ -146,9 +145,10 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
                 </GoBackButton>
                 <HeaderTitle>Código de Segurança</HeaderTitle>
               </HeaderTopInfo>
+
               <EstablishmentInfo>
-                <WaiterName>Garçom: Moes</WaiterName>
-                <TableNumberText>Mesa: 2</TableNumberText>
+                <WaiterName>{`Garçom: ${establishment.waiter}`}</WaiterName>
+                <TableNumberText>{`Mesa: ${establishment.table_number}`}</TableNumberText>
               </EstablishmentInfo>
             </Header>
 
@@ -168,7 +168,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
                 <Input
                   autoCorrect={false}
                   autoCapitalize="characters"
-                  name="costumer_name"
+                  name="customer_name"
                   icon="user"
                   placeholder="Digite o seu nome"
                   returnKeyType="next"
@@ -195,9 +195,6 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
-      {/* <Footer>
-
-      </Footer> */}
     </>
   );
 };
