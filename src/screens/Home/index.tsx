@@ -67,7 +67,7 @@ export const Home: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     api.get('/categories').then(response => {
-      const categoriesApp = [{ id: '0', name: 'Todas' }, ...response.data];
+      const categoriesApp = [{ id: '0', name: 'Destaques' }, ...response.data];
       setCategories(categoriesApp);
       setRefreshing(false);
     });

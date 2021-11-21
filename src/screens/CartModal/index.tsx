@@ -97,7 +97,7 @@ export const CartModal: React.FC<ICartModal> = ({ navigation }) => {
 
         <CartItemsContainer>
           <CartItemsListHeader>
-            <Title>{`Items: ${summary.total_items}`}</Title>
+            <Title>{`Itens: ${summary.total_items}`}</Title>
             <Title>{`Valor Total: ${summary.total}`}</Title>
           </CartItemsListHeader>
           {cart_items.length > 0 && (
@@ -120,7 +120,7 @@ export const CartModal: React.FC<ICartModal> = ({ navigation }) => {
         </CartItemsContainer>
 
         <Footer>
-          <Button onPress={handleGoToCheckout}>Finalizar Pedido</Button>
+          <Button onPress={handleGoToCheckout}>Enviar Pedido</Button>
         </Footer>
       </Container>
     </>

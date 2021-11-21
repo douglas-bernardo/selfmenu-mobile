@@ -1,4 +1,6 @@
 import styled from 'styled-components/native';
+
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { FlatList, TouchableOpacity } from 'react-native';
@@ -12,22 +14,30 @@ export const Container = styled.View`
 
 export const Header = styled.View`
   width: 100%;
-  height: ${RFPercentage(30)}px;
+  height: ${RFPercentage(28)}px;
 
-  background-color: ${({ theme }) => theme.colors.shape};
+  background-color: ${({ theme }) => theme.colors.background};
 
   justify-content: center;
   align-items: flex-start;
   flex-direction: row;
+
+  border-bottom-left-radius: 35px;
 `;
 
-export const TableInfoWrapper = styled.View`
-  flex: 1;
-  padding: 0 24px;
-  margin-top: ${getStatusBarHeight() + RFValue(10)}px;
+export const RestaurantWrapper = styled.View`
+  width: 100%;
 
-  flex-direction: column;
-  justify-content: center;
+  padding: 0 24px;
+  margin-top: ${getStatusBarHeight() + RFValue(40)}px;
+
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const RestaurantInfo = styled.View`
+  flex-direction: row;
   align-items: center;
 `;
 
@@ -40,15 +50,9 @@ export const Logo = styled.Image`
   border-radius: 10px;
 `;
 
-export const TableIdentify = styled.Text`
-  color: ${({ theme }) => theme.colors.attention};
-  font-family: ${({ theme }) => theme.fonts.bold};
-  font-size: ${RFValue(26)}px;
-`;
-
-export const EstablishmentInfo = styled.View`
-  position: absolute;
+export const TableInfo = styled.View`
   width: 100%;
+  position: absolute;
 
   flex-direction: row;
   justify-content: space-between;
@@ -57,13 +61,26 @@ export const EstablishmentInfo = styled.View`
   bottom: 20px;
 `;
 
-export const EstablishmentName = styled.Text`
+export const WaiterName = styled.Text`
   color: ${({ theme }) => theme.colors.attention};
   font-family: ${({ theme }) => theme.fonts.bold};
 `;
 
-export const WaiterName = styled.Text`
+export const TableNumber = styled.Text`
   color: ${({ theme }) => theme.colors.attention};
+  font-family: ${({ theme }) => theme.fonts.bold};
+`;
+
+export const Restaurant = styled.View`
+  margin-left: 17px;
+`;
+
+export const RestaurantGreeting = styled.Text`
+  color: ${({ theme }) => theme.colors.text_dark};
+`;
+
+export const RestaurantName = styled.Text`
+  color: ${({ theme }) => theme.colors.text_dark};
   font-family: ${({ theme }) => theme.fonts.bold};
 `;
 

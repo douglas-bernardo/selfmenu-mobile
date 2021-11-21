@@ -2,17 +2,21 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ActivityIndicator, Alert } from 'react-native';
 import { StackParamList } from '../../routes/app.routes';
 
 import {
   Container,
   Header,
-  TableInfoWrapper,
-  Logo,
-  TableIdentify,
-  EstablishmentInfo,
-  EstablishmentName,
+  RestaurantWrapper,
+  RestaurantInfo,
+  TableInfo,
   WaiterName,
+  TableNumber,
+  Logo,
+  Restaurant,
+  RestaurantGreeting,
+  RestaurantName,
   OrdersContainer,
   Title,
   OrderItemsList,
@@ -46,7 +50,11 @@ interface IStatusOrder {
 
 export interface IOrder {
   id: string;
+  table_id: string;
+  table_token: string;
   customer_name: string;
+  establishment_id: string;
+  status_order_id: number;
   status_order: IStatusOrder;
   order_products: IOrderProducts[];
   items_quantity: number;
@@ -59,57 +67,78 @@ interface PropIcons {
 
 const typeIcon: PropIcons = {
   1: 'download-outline',
-  2: 'checkmark-circle-outline',
-  3: 'ellipsis-horizontal-outline',
-  4: 'cash-outline',
+  2: 'ellipsis-horizontal-outline',
+  3: 'checkmark-circle-outline',
+  4: 'fast-food-outline',
+  5: 'cash-outline',
 };
 
 type Props = NativeStackScreenProps<StackParamList>;
 
 export const Orders: React.FC<Props> = ({ navigation }) => {
   const { establishment } = useAuth();
-  const { current_token_table, orders: currentOrders } = useOrder();
+  const { current_token_table, updateOrders } = useOrder();
   const [orders, setOrders] = useState<IOrder[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    api
-      .get<IOrder[]>('/orders', {
-        params: {
-          table_id: establishment.table_id,
-          table_token: current_token_table,
-        },
-      })
-      .then(response => {
-        const dataOrders = response.data.map(order => {
-          const qtd = order.order_products.reduce(
-            (acc, item) => acc + item.quantity,
-            0,
-          );
+    if (current_token_table) {
+      api
+        .get<IOrder[]>('/orders', {
+          params: {
+            table_id: establishment.table_id,
+            table_token: current_token_table,
+          },
+        })
+        .then(response => {
+          const dataOrders = response.data.map(order => {
+            const qtd = order.order_products.reduce(
+              (acc, item) => acc + item.quantity,
+              0,
+            );
 
-          const amt = order.order_products.reduce(
-            (accumulator, product) => {
-              accumulator.total += product.quantity * product.price;
-              return accumulator;
-            },
-            { total: 0 },
+            const amt = order.order_products.reduce(
+              (accumulator, product) => {
+                accumulator.total += product.quantity * product.price;
+                return accumulator;
+              },
+              { total: 0 },
+            );
+            return {
+              ...order,
+              items_quantity: qtd,
+              amount: numberFormatAsCurrency(amt.total),
+            };
+          });
+          setOrders(dataOrders);
+          updateOrders(response.data);
+          // setIsLoading(false);
+          // setRefreshing(false);
+        })
+        .catch(err => {
+          Alert.alert(
+            err.response.data.message
+              ? err.response.data.message
+              : 'Erro na solicitação',
           );
-          return {
-            ...order,
-            items_quantity: qtd,
-            amount: numberFormatAsCurrency(amt.total),
-          };
         });
+    }
+    setIsLoading(false);
+    setRefreshing(false);
+  }, [establishment.table_id, current_token_table, updateOrders, refreshing]);
 
-        setOrders(dataOrders);
-      })
-      .catch(err => {
-        console.log(err.message);
-      });
-  }, [establishment.table_id, current_token_table, currentOrders]);
+  const handleRefreshOrders = useCallback(() => {
+    setRefreshing(true);
+  }, []);
 
   const handleShowOrderDetails = useCallback(
-    (order_id: string) => {
-      navigation.navigate('OrderDetails', { order_id });
+    (order: IOrder) => {
+      if (order.status_order.id === 6) {
+        navigation.navigate('OrderResume', { order_id: order.id });
+      } else {
+        navigation.navigate('OrderDetails', { order_id: order.id });
+      }
     },
     [navigation],
   );
@@ -117,37 +146,44 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
   return (
     <Container>
       <Header>
-        <TableInfoWrapper>
-          <Logo
-            source={{
-              uri: 'https://img.elo7.com.br/product/original/2E973A3/logotipo-personalizada-restaurante-arte-digital-restaurante.jpg',
-            }}
-          />
-          <TableIdentify>{`Mesa: ${establishment.table_number}`}</TableIdentify>
-        </TableInfoWrapper>
+        <RestaurantWrapper>
+          <RestaurantInfo>
+            <Logo
+              source={{
+                uri: 'https://img.elo7.com.br/product/original/2E973A3/logotipo-personalizada-restaurante-arte-digital-restaurante.jpg',
+              }}
+            />
 
-        <EstablishmentInfo>
-          <EstablishmentName>{`${establishment.establishment_name}`}</EstablishmentName>
+            <Restaurant>
+              <RestaurantGreeting>Seus pedidos no,</RestaurantGreeting>
+              <RestaurantName>
+                {establishment.establishment_name}
+              </RestaurantName>
+            </Restaurant>
+          </RestaurantInfo>
+        </RestaurantWrapper>
+        <TableInfo>
           <WaiterName>{`Garçom: ${establishment.waiter}`}</WaiterName>
-        </EstablishmentInfo>
+          <TableNumber>{`Mesa: ${establishment.table_number}`}</TableNumber>
+        </TableInfo>
       </Header>
 
       <OrdersContainer>
         {orders.length > 0 ? (
-          <Title>{`Total de pedidos da mesa: ${orders.length}`}</Title>
+          <Title>{`Quantidade de pedidos: ${orders.length}`}</Title>
         ) : (
           <Title>Você ainda não fez nenhum pedido :(</Title>
         )}
 
-        {orders.length > 0 && (
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#999" />
+        ) : (
           <>
             <OrderItemsList
               data={orders}
               keyExtractor={order => order.id}
               renderItem={({ item: order }) => (
-                <OrderContainer
-                  onPress={() => handleShowOrderDetails(order.id)}
-                >
+                <OrderContainer onPress={() => handleShowOrderDetails(order)}>
                   <OrderResume>
                     <CostumerName>{order.customer_name}</CostumerName>
                     <ItemsResume>
@@ -166,6 +202,8 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
                   </OrderStatus>
                 </OrderContainer>
               )}
+              onRefresh={handleRefreshOrders}
+              refreshing={refreshing}
             />
           </>
         )}

@@ -87,6 +87,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
         await schema.validate(data, { abortEarly: false });
 
         const order = {
+          table_id: establishment.table_id,
           table_token: data.table_token,
           customer_name: data.customer_name,
           establishment_id: establishment.establishment_id,
@@ -118,6 +119,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
     },
     [
       cart_items,
+      establishment.table_id,
       establishment.establishment_id,
       createOrder,
       navigation,
@@ -154,8 +156,8 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
 
             <SecurityContainer>
               <CartItemsListHeader>
-                <Title>{`Items: ${summary.total_items}`}</Title>
-                <Title>{`Valor Total: ${summary.total}`}</Title>
+                <Title>{`Itens: ${summary.total_items}`}</Title>
+                <Title>{`Total: ${summary.total}`}</Title>
               </CartItemsListHeader>
             </SecurityContainer>
 
@@ -172,7 +174,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
                   icon="user"
                   placeholder="Digite o seu nome"
                   returnKeyType="next"
-                  containerStyle={{ marginBottom: 30 }}
+                  containerStyle={{ marginBottom: 20 }}
                 />
                 <Input
                   autoCorrect={false}
@@ -181,6 +183,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
                   icon="shield"
                   placeholder="Insira o código da mesa"
                   returnKeyType="next"
+                  containerStyle={{ marginBottom: 30 }}
                 />
 
                 <Button

@@ -3,7 +3,10 @@ import styled from 'styled-components/native';
 import { FlatList } from 'react-native';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import {
+  getStatusBarHeight,
+  getBottomSpace,
+} from 'react-native-iphone-x-helper';
 import { IItemCart } from '../../components/ItemCart';
 
 export const Container = styled.View`
@@ -80,7 +83,8 @@ export const Title = styled.Text`
 `;
 
 export const CartItemsContainer = styled.View`
-  padding: 24px;
+  flex: 1;
+  padding: 24px 24px 0 24px;
 `;
 
 export const CartItemsList = styled(FlatList as new () => FlatList<IItemCart>)`
@@ -96,8 +100,7 @@ export const CartItemsListHeader = styled.View`
 `;
 
 export const Footer = styled.View`
-  position: absolute;
   width: 100%;
-  padding: 20px;
-  bottom: ${RFValue(10)}px;
+  height: ${RFPercentage(11)}px;
+  padding: 10px 20px;
 `;

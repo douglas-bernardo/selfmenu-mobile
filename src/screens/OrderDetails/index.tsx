@@ -11,7 +11,7 @@ import {
   Container,
   Header,
   TableInfoWrapper,
-  TableIdentify,
+  OrderIdentify,
   EstablishmentInfo,
   EstablishmentName,
   WaiterName,
@@ -28,11 +28,17 @@ import {
   OrderActions,
   OrderActionText,
   OrderStatusText,
+  Footer,
+  CloseOrderButton,
+  InvoiceIcon,
+  CloseOrderButtonText,
+  OrderActionStatusText,
 } from './styles';
 
 import { numberFormatAsCurrency } from '../../utils/numberFormat';
 import api from '../../services/api';
 import { useOrder } from '../../hooks/order';
+import { useAuth } from '../../hooks/auth';
 
 export interface IOrderProducts {
   id: string;
@@ -77,21 +83,24 @@ interface IOrderFeedBack {
 }
 
 const statusOrderFeedBack: IOrderFeedBack = {
-  1: 'Seu pedido foi',
-  2: 'Seu pedido está em',
-  3: 'Seu foi',
+  1: 'Seu pedido foi recebido na cozinha. Aguarde que logo iniciaremos o preparo...',
+  2: 'Legal! Seu pedido já está em preparação',
+  3: 'Seu foi entregue. Aproveite!',
+  6: 'Seu pedido está',
 };
 
 type Props = NativeStackScreenProps<StackParamList>;
 
 export const OrderDetails: React.FC<Props> = ({ navigation }) => {
-  const { clearOrders } = useOrder();
+  const { establishment } = useAuth();
+  const { removeOrder } = useOrder();
   const theme = useTheme();
   const route = useRoute();
   const routeParams = route.params as RouteParams;
 
   const [order, setOrder] = useState<IOrder>();
-  const [refresh, setRefresh] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     api
@@ -123,19 +132,22 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
           }),
         });
 
-        setRefresh(false);
+        setIsLoading(false);
+        setRefreshing(false);
       })
       .catch(err => {
         console.log(err.message);
         Alert.alert('Erro ao consultar item do menu');
       });
-  }, [routeParams.order_id, refresh]);
+  }, [routeParams.order_id, refreshing]);
 
   const handleDeleteItem = useCallback(
     async (item_id: string) => {
       if (order?.order_products.length === 1) {
-        await api.patch(`/orders/${order?.id}/cancel`);
-        await clearOrders();
+        await api.patch(`/orders/${order?.id}/cancel`, {
+          status_order_id: 7,
+        });
+        await removeOrder(order?.id);
         navigation.navigate('Pedidos');
       } else {
         await api.delete(`/orders/${order?.id}/remove-item`, {
@@ -143,10 +155,10 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
             order_product_id: item_id,
           },
         });
-        setRefresh(true);
+        setIsLoading(false);
       }
     },
-    [order, clearOrders, navigation],
+    [order, removeOrder, navigation],
   );
 
   const handleConfirmDeleteItem = useCallback(
@@ -171,24 +183,67 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
     [handleDeleteItem, order?.order_products.length],
   );
 
+  const handleCloseOrder = useCallback(
+    (order_id: string) => {
+      navigation.navigate('OrderResume', { order_id });
+    },
+    [navigation],
+  );
+
+  const handleCancelOrder = useCallback(async () => {
+    if (order) {
+      await api.patch(`/orders/${order?.id}/cancel`, {
+        status_order_id: 7,
+      });
+      await removeOrder(order?.id);
+      navigation.navigate('Pedidos');
+    }
+  }, [order, removeOrder, navigation]);
+
+  const handleConfirmCancelOrder = useCallback(() => {
+    Alert.alert(
+      'Excluir Item?',
+      'Tem certeza que deseja cancelar o pedido? Todos os itens serão excluídos da comanda.',
+      [
+        {
+          text: 'Sim',
+          onPress: () => {
+            handleCancelOrder();
+          },
+        },
+        {
+          text: 'Não',
+        },
+      ],
+    );
+  }, [handleCancelOrder]);
+
+  const handleRefreshItems = useCallback(() => {
+    setRefreshing(true);
+  }, []);
+
   return (
     <Container>
       <Header>
         <TableInfoWrapper>
-          <TableIdentify>Mesa: 2</TableIdentify>
+          <OrderIdentify>{`Pedido: ${
+            order?.customer_name || ''
+          }`}</OrderIdentify>
         </TableInfoWrapper>
 
         <EstablishmentInfo>
-          <EstablishmentName>Does Food</EstablishmentName>
-          <WaiterName>Garçom: Moes</WaiterName>
+          <EstablishmentName>
+            {establishment.establishment_name}
+          </EstablishmentName>
+          <WaiterName>{`Garçom: ${establishment.waiter}`}</WaiterName>
         </EstablishmentInfo>
       </Header>
-      {refresh && <ActivityIndicator size="large" color="#999" />}
+      {isLoading && <ActivityIndicator size="large" color="#999" />}
       {order && (
         <>
           <OrdersContainer>
-            <OrderStatusText>{`${statusOrderFeedBack[order.status_order.id]} ${
-              order.status_order.name
+            <OrderStatusText>{`${
+              statusOrderFeedBack[order.status_order.id]
             }`}</OrderStatusText>
 
             <CartItemsListHeader>
@@ -209,20 +264,42 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
                     </ProductResumeSummary>
                   </ProductResume>
 
-                  <OrderActions
-                    onPress={() => handleConfirmDeleteItem(order_product.id)}
-                  >
-                    <Icon
-                      name="trash-outline"
-                      size={25}
-                      color={theme.colors.attention}
-                    />
-                    <OrderActionText>Excluir</OrderActionText>
-                  </OrderActions>
+                  {order.status_order.id === 1 ? (
+                    <OrderActions
+                      onPress={() => handleConfirmDeleteItem(order_product.id)}
+                    >
+                      <Icon
+                        name="trash-outline"
+                        size={25}
+                        color={theme.colors.attention}
+                      />
+                      <OrderActionText>Excluir</OrderActionText>
+                    </OrderActions>
+                  ) : (
+                    <OrderActionStatusText>
+                      {order.status_order.name}
+                    </OrderActionStatusText>
+                  )}
                 </ProductContainer>
               )}
+              onRefresh={handleRefreshItems}
+              refreshing={refreshing}
             />
           </OrdersContainer>
+
+          <Footer>
+            {(order.status_order.id === 1 && (
+              <CloseOrderButton onPress={handleConfirmCancelOrder}>
+                <CloseOrderButtonText>Cancelar Pedido</CloseOrderButtonText>
+              </CloseOrderButton>
+            )) ||
+              (order.status_order.id === 3 && (
+                <CloseOrderButton onPress={() => handleCloseOrder(order.id)}>
+                  <InvoiceIcon name="file-invoice-dollar" size={20} />
+                  <CloseOrderButtonText>Pedir Conta</CloseOrderButtonText>
+                </CloseOrderButton>
+              ))}
+          </Footer>
         </>
       )}
     </Container>

@@ -10,6 +10,7 @@ import api from '../services/api';
 
 interface IOrder {
   id: string;
+  table_id: string;
   table_token: string;
   customer_name: string;
   status_order_id: number;
@@ -38,6 +39,10 @@ interface IOrderContextData {
   current_token_table: string;
   createOrder(order: ICreateOrderDTO): Promise<void>;
   clearOrders(): Promise<void>;
+  updateOrders(orders: IOrder[]): Promise<void>;
+  updateOrderStatus(order_id: string, status_order_id: number): void;
+  removeOrder(order_id: string): Promise<void>;
+  clearCurrentTableToken(): void;
 }
 
 export const OrderContext = createContext<IOrderContextData>(
@@ -86,11 +91,58 @@ export const OrderProvider: React.FC = ({ children }) => {
     [data.orders],
   );
 
+  const removeOrder = useCallback(
+    async (order_id: string) => {
+      const ordersUpdated = data.orders.filter(item => item.id !== order_id);
+
+      await AsyncStorage.setItem(
+        asyncTableOrders,
+        JSON.stringify(ordersUpdated),
+      );
+
+      setData({
+        orders: ordersUpdated,
+      });
+    },
+    [data.orders],
+  );
+
   const clearOrders = useCallback(async () => {
     await AsyncStorage.multiRemove([asyncTableToken, asyncTableOrders]);
 
     setData({ orders: [] });
   }, []);
+
+  const updateOrders = useCallback(async (orders: IOrder[]) => {
+    await AsyncStorage.setItem(asyncTableOrders, JSON.stringify(orders));
+
+    setData({ orders });
+  }, []);
+
+  const clearCurrentTableToken = useCallback(async () => {
+    await AsyncStorage.removeItem(asyncTableToken);
+
+    setCurrentTableToken('');
+  }, []);
+
+  const updateOrderStatus = useCallback(
+    (order_id: string, status_order_id: number) => {
+      setData(prevState => {
+        return {
+          orders: prevState.orders.map(item => {
+            if (item.id === order_id) {
+              return {
+                ...item,
+                status_order_id,
+              };
+            }
+            return item;
+          }),
+        };
+      });
+    },
+    [],
+  );
 
   return (
     <OrderContext.Provider
@@ -99,6 +151,10 @@ export const OrderProvider: React.FC = ({ children }) => {
         current_token_table: currentTableToken,
         createOrder,
         clearOrders,
+        updateOrders,
+        updateOrderStatus,
+        removeOrder,
+        clearCurrentTableToken,
       }}
     >
       {children}
