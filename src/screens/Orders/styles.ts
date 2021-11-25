@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { RectButton } from 'react-native-gesture-handler';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { RFPercentage, RFValue } from 'react-native-responsive-fontsize';
 import { FlatList, TouchableOpacity } from 'react-native';
@@ -85,6 +85,7 @@ export const RestaurantName = styled.Text`
 `;
 
 export const OrdersContainer = styled.View`
+  flex: 1;
   padding: 24px;
 `;
 
@@ -147,4 +148,28 @@ export const OrderStatusText = styled.Text`
   font-size: ${RFValue(8)}px;
 
   text-align: center;
+`;
+
+export const Footer = styled.View`
+  position: absolute;
+  width: 100%;
+  padding: 20px;
+  bottom: 0;
+`;
+
+export const CloseTableButton = styled(RectButton)`
+  background: ${({ theme }) => theme.colors.success};
+
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 10px;
+  margin-top: 24px;
+  padding: 12px 24px;
+`;
+
+export const CloseTableButtonText = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.medium};
+  color: ${({ theme }) => theme.colors.shape};
+  font-size: 18px;
 `;

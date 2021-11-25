@@ -48,6 +48,7 @@ interface ICartModal {
 }
 
 export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
+  const { setRefresh } = useOrder();
   const theme = useTheme();
   const formRef = useRef<FormHandles>(null);
   const { cart_items, clearCart } = useCart();
@@ -104,6 +105,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
         Alert.alert('Pedido realizado com sucesso!');
         clearCart();
         navigation.navigate('Pedidos');
+        setRefresh();
       } catch (err: any | Yup.ValidationError) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -124,6 +126,7 @@ export const Checkout: React.FC<ICartModal> = ({ navigation }) => {
       createOrder,
       navigation,
       clearCart,
+      setRefresh,
     ],
   );
 

@@ -37,6 +37,7 @@ import { StackParamList } from '../../routes/app.routes';
 import { CartModal } from '../CartModal';
 import { ShowCartButton } from '../../components/ShowCartButton';
 import { useCart } from '../../hooks/cart';
+import { useOrder } from '../../hooks/order';
 
 export interface ICategory {
   id: string;
@@ -55,6 +56,7 @@ export interface IProduct {
 type Props = NativeStackScreenProps<StackParamList>;
 
 export const Home: React.FC<Props> = ({ navigation }) => {
+  const { clearOrders } = useOrder();
   const { establishment, signOut } = useAuth();
   const { cart_items, showCartModal, toggleCartModal } = useCart();
   const theme = useTheme();
@@ -114,8 +116,9 @@ export const Home: React.FC<Props> = ({ navigation }) => {
   }, []);
 
   const handleSignOut = useCallback(() => {
+    clearOrders();
     signOut();
-  }, [signOut]);
+  }, [clearOrders, signOut]);
 
   return (
     <>

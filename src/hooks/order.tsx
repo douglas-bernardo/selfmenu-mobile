@@ -43,6 +43,8 @@ interface IOrderContextData {
   updateOrderStatus(order_id: string, status_order_id: number): void;
   removeOrder(order_id: string): Promise<void>;
   clearCurrentTableToken(): void;
+  refresh: boolean;
+  setRefresh: () => void;
 }
 
 export const OrderContext = createContext<IOrderContextData>(
@@ -50,7 +52,9 @@ export const OrderContext = createContext<IOrderContextData>(
 );
 
 export const OrderProvider: React.FC = ({ children }) => {
+  const [refreshing, setRefreshing] = useState(false);
   const [currentTableToken, setCurrentTableToken] = useState('');
+
   const [data, setData] = useState<IOrderState>({ orders: [] } as IOrderState);
   const asyncTableToken = '@SelfMenu:tableToken';
   const asyncTableOrders = '@SelfMenu:tableOrders';
@@ -108,7 +112,8 @@ export const OrderProvider: React.FC = ({ children }) => {
   );
 
   const clearOrders = useCallback(async () => {
-    await AsyncStorage.multiRemove([asyncTableToken, asyncTableOrders]);
+    // await AsyncStorage.multiRemove([asyncTableToken, asyncTableOrders]);
+    await AsyncStorage.removeItem(asyncTableOrders);
 
     setData({ orders: [] });
   }, []);
@@ -124,6 +129,10 @@ export const OrderProvider: React.FC = ({ children }) => {
 
     setCurrentTableToken('');
   }, []);
+
+  const setRefresh = useCallback(() => {
+    setRefreshing(!refreshing);
+  }, [refreshing]);
 
   const updateOrderStatus = useCallback(
     (order_id: string, status_order_id: number) => {
@@ -155,6 +164,8 @@ export const OrderProvider: React.FC = ({ children }) => {
         updateOrderStatus,
         removeOrder,
         clearCurrentTableToken,
+        refresh: refreshing,
+        setRefresh,
       }}
     >
       {children}

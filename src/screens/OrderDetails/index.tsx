@@ -85,15 +85,15 @@ interface IOrderFeedBack {
 const statusOrderFeedBack: IOrderFeedBack = {
   1: 'Seu pedido foi recebido na cozinha. Aguarde que logo iniciaremos o preparo...',
   2: 'Legal! Seu pedido já está em preparação',
-  3: 'Seu foi entregue. Aproveite!',
-  6: 'Seu pedido está',
+  3: 'Seu esta pronto e já já chegará até sua mesa',
+  4: 'Seu pedido foi entregue. Aproveite!',
 };
 
 type Props = NativeStackScreenProps<StackParamList>;
 
 export const OrderDetails: React.FC<Props> = ({ navigation }) => {
   const { establishment } = useAuth();
-  const { removeOrder } = useOrder();
+  const { removeOrder, setRefresh } = useOrder();
   const theme = useTheme();
   const route = useRoute();
   const routeParams = route.params as RouteParams;
@@ -143,22 +143,32 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
 
   const handleDeleteItem = useCallback(
     async (item_id: string) => {
-      if (order?.order_products.length === 1) {
-        await api.patch(`/orders/${order?.id}/cancel`, {
-          status_order_id: 7,
-        });
-        await removeOrder(order?.id);
-        navigation.navigate('Pedidos');
-      } else {
-        await api.delete(`/orders/${order?.id}/remove-item`, {
+      if (order) {
+        if (order.order_products.length === 1) {
+          await api.patch(`/orders/${order?.id}/cancel`, {
+            status_order_id: 7,
+          });
+          await removeOrder(order?.id);
+          navigation.navigate('Pedidos');
+          setRefresh();
+          return;
+        }
+
+        await api.delete(`/orders/${order.id}/remove-item`, {
           data: {
             order_product_id: item_id,
           },
         });
-        setIsLoading(false);
+
+        setOrder({
+          ...order,
+          order_products: order.order_products.filter(
+            item => item.id !== item_id,
+          ),
+        });
       }
     },
-    [order, removeOrder, navigation],
+    [order, removeOrder, navigation, setRefresh],
   );
 
   const handleConfirmDeleteItem = useCallback(
@@ -198,7 +208,8 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
       await removeOrder(order?.id);
       navigation.navigate('Pedidos');
     }
-  }, [order, removeOrder, navigation]);
+    setRefresh();
+  }, [order, removeOrder, navigation, setRefresh]);
 
   const handleConfirmCancelOrder = useCallback(() => {
     Alert.alert(
@@ -293,7 +304,9 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
                 <CloseOrderButtonText>Cancelar Pedido</CloseOrderButtonText>
               </CloseOrderButton>
             )) ||
-              (order.status_order.id === 3 && (
+              ((order.status_order.id === 2 ||
+                order.status_order.id === 3 ||
+                order.status_order.id === 4) && (
                 <CloseOrderButton onPress={() => handleCloseOrder(order.id)}>
                   <InvoiceIcon name="file-invoice-dollar" size={20} />
                   <CloseOrderButtonText>Pedir Conta</CloseOrderButtonText>

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ActivityIndicator, Alert } from 'react-native';
@@ -28,6 +29,9 @@ import {
   Amount,
   OrderStatus,
   OrderStatusText,
+  Footer,
+  CloseTableButton,
+  CloseTableButtonText,
 } from './styles';
 import { useOrder } from '../../hooks/order';
 import { numberFormatAsCurrency } from '../../utils/numberFormat';
@@ -76,11 +80,21 @@ const typeIcon: PropIcons = {
 type Props = NativeStackScreenProps<StackParamList>;
 
 export const Orders: React.FC<Props> = ({ navigation }) => {
-  const { establishment } = useAuth();
+  const { refresh } = useOrder();
+
+  const { establishment, updateEstablishment } = useAuth();
   const { current_token_table, updateOrders } = useOrder();
-  const [orders, setOrders] = useState<IOrder[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [ordersAttended, setOrdersAttended] = useState(false);
+  const [orders, setOrders] = useState<IOrder[]>([]);
+
+  const [tableResume, setTableResume] = useState({
+    order_quantity: 0,
+    total_amount: '',
+  });
 
   useEffect(() => {
     if (current_token_table) {
@@ -92,6 +106,12 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
           },
         })
         .then(response => {
+          setOrdersAttended(
+            response.data.some(order => {
+              return order.status_order_id !== 1;
+            }),
+          );
+
           const dataOrders = response.data.map(order => {
             const qtd = order.order_products.reduce(
               (acc, item) => acc + item.quantity,
@@ -109,12 +129,29 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
               ...order,
               items_quantity: qtd,
               amount: numberFormatAsCurrency(amt.total),
+              total_price: amt.total,
             };
           });
+
+          const table_resume = dataOrders.reduce(
+            (acc, item) => {
+              acc.order_quantity += item.items_quantity;
+              acc.total_amount += item.total_price;
+              return acc;
+            },
+            {
+              order_quantity: 0,
+              total_amount: 0,
+            },
+          );
+
+          setTableResume({
+            order_quantity: table_resume.order_quantity,
+            total_amount: numberFormatAsCurrency(table_resume.total_amount),
+          });
+
           setOrders(dataOrders);
           updateOrders(response.data);
-          // setIsLoading(false);
-          // setRefreshing(false);
         })
         .catch(err => {
           Alert.alert(
@@ -126,7 +163,13 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
     }
     setIsLoading(false);
     setRefreshing(false);
-  }, [establishment.table_id, current_token_table, updateOrders, refreshing]);
+  }, [
+    establishment.table_id,
+    current_token_table,
+    updateOrders,
+    refreshing,
+    refresh,
+  ]);
 
   const handleRefreshOrders = useCallback(() => {
     setRefreshing(true);
@@ -142,6 +185,50 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
     },
     [navigation],
   );
+
+  const handleCloseTable = useCallback(
+    async (table_id: string) => {
+      await api.patch(`/tables/${table_id}`, {
+        status_table_id: 3,
+      });
+
+      updateEstablishment({
+        ...establishment,
+        status_table_id: 3,
+      });
+
+      Alert.alert(
+        'Mesa Encerrada',
+        'O garçom esta já está indo até sua mesa. Aguarde!',
+      );
+    },
+    [updateEstablishment, establishment],
+  );
+
+  const handleConfirmCloseTable = useCallback(() => {
+    if (orders.length > 0) {
+      Alert.alert(
+        'Encerrar mesa?',
+        `Valor total mesa: ${tableResume.total_amount}. O garçom virá até sua mesa receber o pagamento. Confirma encerramento da mesa?`,
+        [
+          {
+            text: 'Sim',
+            onPress: () => {
+              handleCloseTable(establishment.table_id);
+            },
+          },
+          {
+            text: 'Não',
+          },
+        ],
+      );
+    }
+  }, [
+    orders.length,
+    handleCloseTable,
+    establishment.table_id,
+    tableResume.total_amount,
+  ]);
 
   return (
     <Container>
@@ -170,7 +257,10 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
 
       <OrdersContainer>
         {orders.length > 0 ? (
-          <Title>{`Quantidade de pedidos: ${orders.length}`}</Title>
+          <>
+            <Title>{`Total de pedidos: ${tableResume.order_quantity}`}</Title>
+            <Title>{`Valor total mesa: ${tableResume.total_amount}`}</Title>
+          </>
         ) : (
           <Title>Você ainda não fez nenhum pedido :(</Title>
         )}
@@ -208,6 +298,17 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
           </>
         )}
       </OrdersContainer>
+
+      <Footer>
+        {(establishment.status_table_id === 3 && (
+          <Title>Aguarde o garçom já está vindo até você!</Title>
+        )) ||
+          (ordersAttended && (
+            <CloseTableButton onPress={handleConfirmCloseTable}>
+              <CloseTableButtonText>Encerrar Mesa</CloseTableButtonText>
+            </CloseTableButton>
+          ))}
+      </Footer>
     </Container>
   );
 };
