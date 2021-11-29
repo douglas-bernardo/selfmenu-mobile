@@ -166,6 +166,8 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
             item => item.id !== item_id,
           ),
         });
+
+        setRefresh();
       }
     },
     [order, removeOrder, navigation, setRefresh],
@@ -213,7 +215,7 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
 
   const handleConfirmCancelOrder = useCallback(() => {
     Alert.alert(
-      'Excluir Item?',
+      'Cancelar Pedido?',
       'Tem certeza que deseja cancelar o pedido? Todos os itens serão excluídos da comanda.',
       [
         {
@@ -304,9 +306,7 @@ export const OrderDetails: React.FC<Props> = ({ navigation }) => {
                 <CloseOrderButtonText>Cancelar Pedido</CloseOrderButtonText>
               </CloseOrderButton>
             )) ||
-              ((order.status_order.id === 2 ||
-                order.status_order.id === 3 ||
-                order.status_order.id === 4) && (
+              (order.status_order.id === 4 && (
                 <CloseOrderButton onPress={() => handleCloseOrder(order.id)}>
                   <InvoiceIcon name="file-invoice-dollar" size={20} />
                   <CloseOrderButtonText>Pedir Conta</CloseOrderButtonText>

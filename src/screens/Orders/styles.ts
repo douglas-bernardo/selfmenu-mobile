@@ -157,6 +157,11 @@ export const Footer = styled.View`
   bottom: 0;
 `;
 
+export const StatusTableContainer = styled.View`
+  justify-content: center;
+  align-items: center;
+`;
+
 export const CloseTableButton = styled(RectButton)`
   background: ${({ theme }) => theme.colors.success};
 

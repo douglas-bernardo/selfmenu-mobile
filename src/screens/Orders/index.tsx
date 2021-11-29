@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ActivityIndicator, Alert } from 'react-native';
@@ -30,6 +29,7 @@ import {
   OrderStatus,
   OrderStatusText,
   Footer,
+  StatusTableContainer,
   CloseTableButton,
   CloseTableButtonText,
 } from './styles';
@@ -92,7 +92,6 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
   const [orders, setOrders] = useState<IOrder[]>([]);
 
   const [tableResume, setTableResume] = useState({
-    order_quantity: 0,
     total_amount: '',
   });
 
@@ -135,18 +134,15 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
 
           const table_resume = dataOrders.reduce(
             (acc, item) => {
-              acc.order_quantity += item.items_quantity;
               acc.total_amount += item.total_price;
               return acc;
             },
             {
-              order_quantity: 0,
               total_amount: 0,
             },
           );
 
           setTableResume({
-            order_quantity: table_resume.order_quantity,
             total_amount: numberFormatAsCurrency(table_resume.total_amount),
           });
 
@@ -177,13 +173,13 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
 
   const handleShowOrderDetails = useCallback(
     (order: IOrder) => {
-      if (order.status_order.id === 6) {
+      if (order.status_order.id === 5 || establishment.status_table_id === 3) {
         navigation.navigate('OrderResume', { order_id: order.id });
       } else {
         navigation.navigate('OrderDetails', { order_id: order.id });
       }
     },
-    [navigation],
+    [navigation, establishment.status_table_id],
   );
 
   const handleCloseTable = useCallback(
@@ -258,7 +254,7 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
       <OrdersContainer>
         {orders.length > 0 ? (
           <>
-            <Title>{`Total de pedidos: ${tableResume.order_quantity}`}</Title>
+            <Title>{`Total de pedidos: ${orders.length}`}</Title>
             <Title>{`Valor total mesa: ${tableResume.total_amount}`}</Title>
           </>
         ) : (
@@ -301,7 +297,9 @@ export const Orders: React.FC<Props> = ({ navigation }) => {
 
       <Footer>
         {(establishment.status_table_id === 3 && (
-          <Title>Aguarde o garçom já está vindo até você!</Title>
+          <StatusTableContainer>
+            <Title>Aguarde o garçom já está vindo até você!</Title>
+          </StatusTableContainer>
         )) ||
           (ordersAttended && (
             <CloseTableButton onPress={handleConfirmCloseTable}>

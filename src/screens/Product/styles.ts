@@ -111,6 +111,17 @@ export const AddItemToOrderContainer = styled.View`
   bottom: ${RFValue(10)}px;
 `;
 
+export const StatusTableContainer = styled.View`
+  width: 100%;
+  position: absolute;
+  padding: 0 10px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  bottom: ${RFValue(10)}px;
+`;
+
 export const AddControl = styled.View`
   flex: 1;
   height: 60px;

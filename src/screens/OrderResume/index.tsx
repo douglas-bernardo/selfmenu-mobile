@@ -218,7 +218,8 @@ export const OrderResume: React.FC<Props> = ({ navigation }) => {
           </ItemsListResumeHeader>
 
           <Footer>
-            {order.status_order.id === 6 ? (
+            {order.status_order.id === 5 ||
+            establishment.status_table_id === 3 ? (
               <StatusOrderText>{order.status_order.name}</StatusOrderText>
             ) : (
               <PaymentOrderButton

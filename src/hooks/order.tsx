@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import api from '../services/api';
+import { useAuth } from './auth';
 
 interface IOrder {
   id: string;
@@ -52,6 +53,7 @@ export const OrderContext = createContext<IOrderContextData>(
 );
 
 export const OrderProvider: React.FC = ({ children }) => {
+  const { establishment } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [currentTableToken, setCurrentTableToken] = useState('');
 
@@ -66,14 +68,20 @@ export const OrderProvider: React.FC = ({ children }) => {
         asyncTableOrders,
       ]);
 
-      if (table_token[1] && orders[1]) {
+      if (establishment?.table_token) {
+        setCurrentTableToken(establishment.table_token);
+        await AsyncStorage.setItem(asyncTableToken, establishment.table_token);
+      } else if (table_token[1]) {
         setCurrentTableToken(table_token[1]);
+      }
+
+      if (orders[1]) {
         setData({ orders: JSON.parse(orders[1]) });
       }
     }
 
     loadStorageData();
-  }, []);
+  }, [establishment?.table_token]);
 
   const createOrder = useCallback(
     async (order: ICreateOrderDTO) => {

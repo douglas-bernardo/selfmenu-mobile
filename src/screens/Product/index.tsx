@@ -14,6 +14,7 @@ import {
   ItemPhoto,
   ItemInfoContainer,
   ItemContainer,
+  StatusTableContainer,
   Title,
   Description,
   DescriptionText,
@@ -38,6 +39,7 @@ import InputItemDetails from '../../components/InputItemDetails';
 import { StackParamList } from '../../routes/app.routes';
 import { ProductOptionsModal } from '../ProductOptionsModal';
 import { useCart } from '../../hooks/cart';
+import { useAuth } from '../../hooks/auth';
 
 export interface IProduct {
   id: string;
@@ -56,8 +58,10 @@ type Props = NativeStackScreenProps<StackParamList>;
 
 export const Product: React.FC<Props> = ({ navigation }) => {
   const route = useRoute();
-  const { addItem } = useCart();
   const routeParams = route.params as RouteParams;
+
+  const { establishment } = useAuth();
+  const { addItem } = useCart();
 
   const [itemDetailsModalOpen, setItemDetailsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -172,23 +176,31 @@ export const Product: React.FC<Props> = ({ navigation }) => {
             </ItemInfoContainer>
 
             <AddItemToOrderContainer>
-              <AddControl>
-                <RemoveItemButton onPress={handleRemoveItemQuantity}>
-                  <RemoveItemIcon name="minus-circle" />
-                </RemoveItemButton>
+              {establishment.status_table_id === 3 ? (
+                <StatusTableContainer>
+                  <Title>Mesa em fechamento</Title>
+                </StatusTableContainer>
+              ) : (
+                <>
+                  <AddControl>
+                    <RemoveItemButton onPress={handleRemoveItemQuantity}>
+                      <RemoveItemIcon name="minus-circle" />
+                    </RemoveItemButton>
 
-                <TotalItemsText>{quantity}</TotalItemsText>
+                    <TotalItemsText>{quantity}</TotalItemsText>
 
-                <AddItemButton onPress={handleAddItemQuantity}>
-                  <AddItemIcon name="plus-circle" />
-                </AddItemButton>
-              </AddControl>
-              <AddItemOrderButton onPress={handleAddItemToCart}>
-                <AddItemOrderButtonText>Adicionar</AddItemOrderButtonText>
-                <ValueOrderTotalText>
-                  {valueOrderTotalFormatted}
-                </ValueOrderTotalText>
-              </AddItemOrderButton>
+                    <AddItemButton onPress={handleAddItemQuantity}>
+                      <AddItemIcon name="plus-circle" />
+                    </AddItemButton>
+                  </AddControl>
+                  <AddItemOrderButton onPress={handleAddItemToCart}>
+                    <AddItemOrderButtonText>Adicionar</AddItemOrderButtonText>
+                    <ValueOrderTotalText>
+                      {valueOrderTotalFormatted}
+                    </ValueOrderTotalText>
+                  </AddItemOrderButton>
+                </>
+              )}
             </AddItemToOrderContainer>
           </>
         )}
