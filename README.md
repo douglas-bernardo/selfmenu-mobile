@@ -1,7 +1,7 @@
 
 <h1 style="display: flex; align-items: center; justify-content: center;" class="logo">
     <img width="100" style="margin-right: 20px;" src="https://ik.imagekit.io/rcjzrqiiqm7/selfmenu-logo_iEOmSYdmP.svg?updatedAt=1640657286894">
-  Selfmenu WEB - Painel Admin
+  Selfmenu App
 </h1>
 
 &nbsp;
